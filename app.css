@@ -1,50 +1,380 @@
+/* Modern Input Fields and Buttons */
+.modern-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.modern-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.modern-button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.modern-button:hover {
+    background-color: #0056b3;
+}
+
+/* Add School and Librarian Section Styling */
+#addSchool, #addLibrarian {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+#addSchool h2, #addLibrarian h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Existing Styles */
 body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #954535, #2575fc);
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
 }
 
 #login-box {
-    border: 2px solid brown;
-    padding: 20px;
+    background: white;
     border-radius: 10px;
-    background-color: white;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.left {
+    width: 300px;
+    padding: 40px;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
-h1 {
-    margin-bottom: 20px;
-    color: brown;
+.left h1 {
+    margin: 0 0 20px 0;
+    color: #333;
 }
 
-input[type="text"], input[type="password"] {
-    margin-bottom: 15px;
+.left input[type="text"],
+.left input[type="password"],
+.left input[type="submit"] {
+    width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    margin: 10px 0;
+    border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
 }
 
-input[type="submit"] {
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: brown;
+.left input[type="submit"] {
+    background: #6a11cb;
     color: white;
-    font-size: 16px;
+    border: none;
     cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-input[type="submit"]:hover {
-    background-color: #a0522d;
+.left input[type="submit"]:hover {
+    background: #2575fc;
 }
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+#navbar {
+    width: 220px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+#navbar .logo h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+#navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+}
+
+#navbar ul li {
+    margin: 15px 0;
+}
+
+#navbar ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#navbar ul li a:hover {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+#main {
+    flex: 1;
+    padding: 20px;
+    margin-left: 250px;
+    background-color: #ecf0f1;
+    overflow-y: auto;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+    display: none;
+}
+
+#dashboard {
+    display: block;
+}
+
+h2 {
+    margin: 0 0 20px;
+    color: #2c3e50;
+    font-size: 24px;
+    font-weight: 600;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+#displaySchools, #displayLibrarians {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap to the next line if needed */
+    gap: 20px; /* Space between items */
+    justify-content: flex-start; /* Align items to the start of the container */
+}
+
+/* Item styles for side-by-side layout */
+.school-item, .librarian-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(33.333% - 20px); /* Adjust this percentage for the number of items per row */
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+
+.school-item:hover, .librarian-item:hover {
+    transform: scale(1.02);
+}
+
+.school-item img, .librarian-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 8px 8px 0 0;
+}
+
+.school-item .details, .librarian-item .details {
+    font-size: 16px;
+    color: #34495e;
+    padding: 15px 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.modern-search-input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.modern-search-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.settings {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.settings-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #555;
+}
+
+.settings-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+.settings-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: #333;
+    font-size: 14px;
+}
+
+.settings-menu button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Show settings menu on button click */
+.settings-button:focus + .settings-menu,
+.settings-menu:hover {
+    display: block;
+}
+
+/* Modernize list styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    margin: 10px 0;
+    border: 1px solid #ddd;
+}
+
+/* Ensure items are responsive and aligned */
+@media (max-width: 768px) {
+    .school-item, .librarian-item {
+        flex: 1 1 calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .school-item, .librarian-item {
+        flex: 1 1 100%;
+    }
+}
+
+/* Reuse styles for user-item from librarian-item */
+.user-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.user-item:hover {
+    transform: scale(1.02);
+}
+
+.user-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 8px 8px 0 0;
+}
+
+.user-item .details {
+    font-size: 16px;
+    color: #34495e;
+    padding: 15px 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.book-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.book-item:hover {
+    transform: scale(1.02);
+}
+
+.book-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 8px 8px 0 0;
+}
+
+.book-item .details {
+    font-size: 16px;
+    color: #34495e;
+    padding: 15px 0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* The settings buttons and menu styling remain the same */
+
