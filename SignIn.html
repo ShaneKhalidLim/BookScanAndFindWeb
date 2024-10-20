@@ -42,45 +42,70 @@
         }
 
         // Login event listener
-        document.getElementById('login').addEventListener('click', async () => {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+        // Login event listener
+document.getElementById('login').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-            if (!email || !password) {
-                alert('Please enter both email and password.');
-                return;
-            }
+    if (!email || !password) {
+        alert('Please enter both email and password.');
+        return;
+    }
 
-            try {
-                // Check if the user is a Librarian in Realtime Database
-                const librariansRef = ref(database, 'librarians');
-                const librarianSnapshot = await get(librariansRef);
+    try {
+        // Check if the user is an Admin in Realtime Database
+        const adminRef = ref(database, 'Admin');
+        const adminSnapshot = await get(adminRef);
 
-                if (librarianSnapshot.exists()) {
-                    let librarianFound = false;
+        if (adminSnapshot.exists()) {
+            let adminFound = false;
 
-                    // Loop through the librarian entries to find a match for email and password
-                    librarianSnapshot.forEach(childSnapshot => {
-                        const librarian = childSnapshot.val();
-                        if (librarian.email === email && librarian.password === password) {
-                            librarianFound = true;
-                            sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
-                            // Redirect to librarian dashboard
-                            window.location.href = 'librarian.html';
-                        }
-                    });
-
-                    if (!librarianFound) {
-                        alert('Email or password is incorrect for a librarian.');
-                    }
-                } else {
-                    alert('No librarians found.');
+            // Loop through the admin entries to find a match for email
+            adminSnapshot.forEach(childSnapshot => {
+                const admin = childSnapshot.val();
+                if (admin.email === email) {
+                    adminFound = true;
+                    sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+                    // Redirect to admin dashboard
+                    window.location.href = 'dashboard.html';
                 }
-            } catch (error) {
-                // Handle error, such as network issues
-                alert(`Error: ${error.message}`);
+            });
+
+            if (adminFound) {
+                return; // Stop further execution if admin is found
             }
-        });
+        }
+
+        // If not an admin, check if the user is a Librarian
+        const librariansRef = ref(database, 'librarians');
+        const librarianSnapshot = await get(librariansRef);
+
+        if (librarianSnapshot.exists()) {
+            let librarianFound = false;
+
+            // Loop through the librarian entries to find a match for email and password
+            librarianSnapshot.forEach(childSnapshot => {
+                const librarian = childSnapshot.val();
+                if (librarian.email === email && librarian.password === password) {
+                    librarianFound = true;
+                    sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+                    // Redirect to librarian dashboard
+                    window.location.href = 'librarian.html';
+                }
+            });
+
+            if (!librarianFound) {
+                alert('Email or password is incorrect.');
+            }
+        } else {
+            alert('No librarians found.');
+        }
+    } catch (error) {
+        // Handle error, such as network issues
+        alert(`Error: ${error.message}`);
+    }
+});
+
     </script>
 </body>
 </html>

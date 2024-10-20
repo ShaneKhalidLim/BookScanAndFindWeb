@@ -17,7 +17,7 @@
                 <h1>BookScan&Find</h1>
             </div>
             <ul>
-                <li><a href="#" class="nav-link" data-target="dashboard">Dashboard</a></li> <!-- Dashboard Link -->
+                <li><a href="#" class="nav-link" data-target="Dashboard">Dashboard</a></li> <!-- Dashboard Link -->
                 <li><a href="#" class="nav-link" data-target="addBook">Add Book</a></li> <!-- Add Book Link -->
                 <li><a href="#" class="nav-link" data-target="addUser">Add User</a></li> <!-- Add User Link -->
                 <li><a href="#" class="nav-link" data-target="displayBooks">Books Registered</a></li>
@@ -27,11 +27,10 @@
         </div>
         <div id="main">
             <!-- Dashboard Section -->
-            <div id="dashboard" class="section">
+            <div id="Dashboard" class="section">
                 <h2>Dashboard</h2>
                 <canvas id="dashboardChart" width="400" height="200"></canvas>
             </div>
-
             <!-- Add Book Section -->
             <div id="addBook" class="section">
                 <h2>Add Book</h2>
@@ -49,6 +48,34 @@
                 <button id="submitBook" class="modern-button">Add Book</button>
             </div>
 
+            <!-- Edit Book Section -->
+            <div id="editBook" class="section">
+                <h2>Edit Book</h2>
+                <label for="edit_book_id">Book ID</label>
+                <input type="text" id="edit_book_id" placeholder="Book ID" class="modern-input" readonly>
+                <label for="edit_book_img">Book Image</label>
+                <input type="file" id="edit_book_img" class="modern-input">
+                <label for="edit_book_title">Book Title</label>
+                <input type="text" id="edit_book_title" placeholder="Book Title" class="modern-input">
+                <label for="edit_book_author">Author</label>
+                <input type="text" id="edit_book_author" placeholder="Author" class="modern-input">
+                <label for="edit_book_description">Description</label>
+                <textarea id="edit_book_description" placeholder="Description" class="modern-input"></textarea>
+                <label for="edit_book_category">Category</label>
+                <input type="text" id="edit_book_category" placeholder="Category" class="modern-input">
+                <label for="edit_book_callnumber">Call Number</label>
+                <input type="text" id="edit_book_callnumber" placeholder="Call Number" class="modern-input">
+                <label for="edit_book_barcode">Barcode</label>
+                <input type="text" id="edit_book_barcode" placeholder="Barcode" class="modern-input">
+                <label for="edit_book_shelfNumber">Shelf Number</label>
+                <input type="number" id="edit_book_shelfNumber" placeholder="Shelf Number" class="modern-input">
+                <label for="edit_book_shelfRow">Shelf Row</label>
+                <input type="number" id="edit_book_shelfRow" placeholder="Shelf Row" class="modern-input">
+                <label for="edit_book_shelfColumn">Shelf Column</label>
+                <input type="number" id="edit_book_shelfColumn" placeholder="Shelf Column" class="modern-input">
+                <button id="updateBook" class="modern-button">Update Book</button>
+            </div>
+
             <!-- Add User Section -->
             <div id="addUser" class="section">
                 <h2>Add User</h2>
@@ -61,6 +88,20 @@
                 <input type="password" id="user_password" placeholder="Password" class="modern-input">
                 <input type="text" id="user_contactnumber" placeholder="Contact Number" class="modern-input">
                 <button id="submitUser" class="modern-button">Add User</button>
+            </div>
+
+            <!-- Edit User Section -->
+            <div id="editUser" class="section">
+                <h2>Edit User</h2>
+                <input type="text" id="edit_user_id" placeholder="User ID" class="modern-input" readonly>
+                <input type="file" id="edit_user_img" class="modern-input">
+                <input type="text" id="edit_user_schoolid" placeholder="School ID" class="modern-input">
+                <input type="text" id="edit_user_lastname" placeholder="Last Name" class="modern-input">
+                <input type="text" id="edit_user_firstname" placeholder="First Name" class="modern-input">
+                <input type="text" id="edit_user_middleinitial" placeholder="Middle Initial (optional)" class="modern-input">
+                <input type="password" id="edit_user_password" placeholder="Password" class="modern-input">
+                <input type="text" id="edit_user_contactnumber" placeholder="Contact Number" class="modern-input">
+                <button id="updateUser" class="modern-button">Update User</button>
             </div>
 
             <!-- Display Books Section -->
@@ -81,7 +122,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getDatabase, ref, get, child, set, push } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getDatabase, ref, get, child, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
@@ -102,11 +143,8 @@
         const storage = getStorage(app);
         const auth = getAuth(app);
 
-        function checkAuthentication() {
-            if (!sessionStorage.getItem('loggedIn')) {
-                window.location.replace('signin.html');
-            }
-        }
+        let currentEditingBookId = null;
+        let currentEditingUserId = null;
 
         // Logout Functionality
         document.getElementById('logout').addEventListener('click', () => {
@@ -118,107 +156,9 @@
             });
         });
 
-        // Update Dashboard Chart
-        function updateDashboardChart() {
-            const labels = ['Books', 'Users'];
-            const data = [0, 0];
-
-            get(child(ref(database), 'books')).then(snapshot => {
-                data[0] = snapshot.exists() ? snapshot.size : 0;
-                return get(child(ref(database), 'users'));
-            }).then(snapshot => {
-                data[1] = snapshot.exists() ? snapshot.size : 0;
-
-                new Chart(document.getElementById('dashboardChart').getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Counts',
-                            data: data,
-                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }).catch(error => alert('Failed to update chart: ' + error.message));
-        }
-
-        // Display Books
-        function displayBooks() {
-            const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
-            const booksList = document.getElementById('booksList');
-            booksList.innerHTML = '';
-
-            get(child(ref(database), 'books')).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const book = childSnapshot.val();
-                        const bookId = childSnapshot.key;
-
-                        if (book.title.toLowerCase().includes(searchQuery) || 
-                            book.author.toLowerCase().includes(searchQuery)) {
-                            
-                            const listItem = document.createElement('li');
-                            listItem.className = 'book-item';
-                            listItem.dataset.id = bookId;
-                            listItem.innerHTML = `
-                                <img src="${book.imageURL}" alt="Book Image">
-                                <div class="details">${book.title}<br>${book.author}</div>
-                            `;
-                            booksList.appendChild(listItem);
-                        }
-                    });
-                } else {
-                    booksList.innerHTML = '<li>No books registered</li>';
-                }
-            }).catch(error => alert('Failed to retrieve books: ' + error.message));
-        }
-
-        // Display Users
-        function displayUsers() {
-            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = '';
-
-            get(child(ref(database), 'users')).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const user = childSnapshot.val();
-                        const userId = childSnapshot.key;
-
-                        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-                        const contactNumber = user.contactNumber || 'No Contact Number';
-                        const profileImageUrl = user.profileImageUrl || 'default-user.png';
-
-                        if (fullName.toLowerCase().includes(searchQuery) || contactNumber.toLowerCase().includes(searchQuery)) {
-                            const listItem = document.createElement('li');
-                            listItem.className = 'user-item';
-                            listItem.dataset.id = userId;
-                            listItem.innerHTML = `
-                                <img src="${profileImageUrl}" alt="User Image">
-                                <div class="details">${fullName}<br>${contactNumber}</div>
-                            `;
-                            usersList.appendChild(listItem);
-                        }
-                    });
-                } else {
-                    usersList.innerHTML = '<li>No users registered</li>';
-                }
-            }).catch(error => alert('Failed to retrieve users: ' + error.message));
-        }
-
         // Add Book
         document.getElementById('submitBook').addEventListener('click', () => {
-            const bookId = document.getElementById('book_id').value.trim();  // Book ID input field
+            const bookId = document.getElementById('book_id').value.trim();
             const bookTitle = document.getElementById('book_title').value;
             const bookAuthor = document.getElementById('book_author').value;
             const bookDescription = document.getElementById('book_description').value;
@@ -270,7 +210,7 @@
 
         // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
-            const userId = document.getElementById('user_id').value.trim();  // User ID input field
+            const userId = document.getElementById('user_id').value.trim();
             const userSchoolId = document.getElementById('user_schoolid').value.trim();
             const userLastName = document.getElementById('user_lastname').value.trim();
             const userFirstName = document.getElementById('user_firstname').value.trim();
@@ -311,19 +251,276 @@
             }
         });
 
-        // Event listeners for search inputs
-        document.getElementById('searchBookInput').addEventListener('input', displayBooks);
-        document.getElementById('searchUserInput').addEventListener('input', displayUsers);
+        // Update Book
+        document.getElementById('updateBook').addEventListener('click', () => {
+            const bookId = currentEditingBookId;
+            const bookTitle = document.getElementById('edit_book_title').value;
+            const bookAuthor = document.getElementById('edit_book_author').value;
+            const bookDescription = document.getElementById('edit_book_description').value;
+            const bookCategory = document.getElementById('edit_book_category').value;
+            const bookCallNumber = document.getElementById('edit_book_callnumber').value;
+            const bookBarcode = document.getElementById('edit_book_barcode').value;
+            const bookShelfNumber = document.getElementById('edit_book_shelfNumber').value;
+            const bookShelfRow = document.getElementById('edit_book_shelfRow').value;
+            const bookShelfColumn = document.getElementById('edit_book_shelfColumn').value;
+            const bookImg = document.getElementById('edit_book_img').files[0];
+
+            if (bookId && bookTitle && bookAuthor && bookDescription && bookCategory && bookCallNumber && bookBarcode && bookShelfNumber && bookShelfRow && bookShelfColumn) {
+                const bookData = {
+                    title: bookTitle,
+                    author: bookAuthor,
+                    description: bookDescription,
+                    category: bookCategory,
+                    callnumber: bookCallNumber,
+                    barcode: bookBarcode,
+                    shelfNumber: parseInt(bookShelfNumber),
+                    shelfRow: parseInt(bookShelfRow),
+                    shelfColumn: parseInt(bookShelfColumn)
+                };
+
+                if (bookImg) {
+                    const storageReference = storageRef(storage, 'book_images/' + bookId);
+
+                    uploadBytes(storageReference, bookImg)
+                        .then(snapshot => getDownloadURL(snapshot.ref))
+                        .then(url => {
+                            bookData.imageURL = url;
+                            return update(ref(database, 'books/' + bookId), bookData);
+                        })
+                        .then(() => {
+                            alert('Book updated successfully');
+                            navigateToSection('displayBooks');
+                        })
+                        .catch(error => alert('Failed to update book: ' + error.message));
+                } else {
+                    update(ref(database, 'books/' + bookId), bookData)
+                        .then(() => {
+                            alert('Book updated successfully');
+                            navigateToSection('displayBooks');
+                        })
+                        .catch(error => alert('Failed to update book: ' + error.message));
+                }
+            } else {
+                alert('All fields are required');
+            }
+        });
+
+        // Update User
+        document.getElementById('updateUser').addEventListener('click', () => {
+            const userId = currentEditingUserId;
+            const userSchoolId = document.getElementById('edit_user_schoolid').value.trim();
+            const userLastName = document.getElementById('edit_user_lastname').value.trim();
+            const userFirstName = document.getElementById('edit_user_firstname').value.trim();
+            const userMiddleInitial = document.getElementById('edit_user_middleinitial').value.trim();
+            const userPassword = document.getElementById('edit_user_password').value;
+            const userContactNumber = document.getElementById('edit_user_contactnumber').value.trim();
+            const userImg = document.getElementById('edit_user_img').files[0];
+
+            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber) {
+                const userData = {
+                    schoolId: userSchoolId,
+                    lastName: userLastName,
+                    firstName: userFirstName,
+                    middleInitial: userMiddleInitial,
+                    password: userPassword,
+                    contactNumber: userContactNumber
+                };
+
+                if (userImg) {
+                    const storageReference = storageRef(storage, 'user_images/' + userId);
+
+                    uploadBytes(storageReference, userImg)
+                        .then(snapshot => getDownloadURL(snapshot.ref))
+                        .then(url => {
+                            userData.profileImageUrl = url;
+                            return update(ref(database, 'users/' + userId), userData);
+                        })
+                        .then(() => {
+                            alert('User updated successfully');
+                            navigateToSection('displayUsers');
+                        })
+                        .catch(error => alert('Failed to update user: ' + error.message));
+                } else {
+                    update(ref(database, 'users/' + userId), userData)
+                        .then(() => {
+                            alert('User updated successfully');
+                            navigateToSection('displayUsers');
+                        })
+                        .catch(error => alert('Failed to update user: ' + error.message));
+                }
+            } else {
+                alert('All fields are required');
+            }
+        });
+
+        // Display Books
+        function displayBooks() {
+            const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
+
+            get(child(ref(database), 'books')).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const book = childSnapshot.val();
+                        const bookId = childSnapshot.key;
+
+                        if (book.title.toLowerCase().includes(searchQuery) || 
+                            book.author.toLowerCase().includes(searchQuery)) {
+                            
+                            const listItem = document.createElement('li');
+                            listItem.className = 'book-item';
+                            listItem.dataset.id = bookId;
+                            listItem.innerHTML = `
+                                <img src="${book.imageURL}" alt="Book Image">
+                                <div class="details">${book.title}<br>${book.author}</div>
+                                <div class="settings">
+                                    <button class="settings-button">&#x22EE;</button>
+                                    <div class="settings-menu">
+                                        <button class="edit">Edit</button>
+                                    </div>
+                                </div>
+                            `;
+                            booksList.appendChild(listItem);
+
+                            listItem.querySelector('.edit').addEventListener('click', () => {
+                                currentEditingBookId = bookId;
+                                document.getElementById('edit_book_id').value = bookId;
+                                document.getElementById('edit_book_title').value = book.title;
+                                document.getElementById('edit_book_author').value = book.author;
+                                document.getElementById('edit_book_description').value = book.description;
+                                document.getElementById('edit_book_category').value = book.category;
+                                document.getElementById('edit_book_callnumber').value = book.callnumber;
+                                document.getElementById('edit_book_barcode').value = book.barcode;
+                                document.getElementById('edit_book_shelfNumber').value = book.shelfNumber;
+                                document.getElementById('edit_book_shelfRow').value = book.shelfRow;
+                                document.getElementById('edit_book_shelfColumn').value = book.shelfColumn;
+                                navigateToSection('editBook');
+                            });
+                        }
+                    });
+                } else {
+                    booksList.innerHTML = '<li>No books registered</li>';
+                }
+            }).catch(error => alert('Failed to retrieve books: ' + error.message));
+        }
+
+        // Display Users
+        function displayUsers() {
+            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '';
+
+            get(child(ref(database), 'users')).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const user = childSnapshot.val();
+                        const userId = childSnapshot.key;
+
+                        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+                        const contactNumber = user.contactNumber || 'No Contact Number';
+                        const profileImageUrl = user.profileImageUrl || 'default-user.png';
+
+                        if (fullName.toLowerCase().includes(searchQuery) || contactNumber.toLowerCase().includes(searchQuery)) {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'user-item';
+                            listItem.dataset.id = userId;
+                            listItem.innerHTML = `
+                                <img src="${profileImageUrl}" alt="User Image">
+                                <div class="details">${fullName}<br>${contactNumber}</div>
+                                <div class="settings">
+                                    <button class="settings-button">&#x22EE;</button>
+                                    <div class="settings-menu">
+                                        <button class="edit">Edit</button>
+                                    </div>
+                                </div>
+                            `;
+                            usersList.appendChild(listItem);
+
+                            listItem.querySelector('.edit').addEventListener('click', () => {
+                                currentEditingUserId = userId;
+                                document.getElementById('edit_user_id').value = userId;
+                                document.getElementById('edit_user_schoolid').value = user.schoolId;
+                                document.getElementById('edit_user_lastname').value = user.lastName;
+                                document.getElementById('edit_user_firstname').value = user.firstName;
+                                document.getElementById('edit_user_middleinitial').value = user.middleInitial || '';
+                                document.getElementById('edit_user_password').value = user.password;
+                                document.getElementById('edit_user_contactnumber').value = user.contactNumber;
+                                navigateToSection('editUser');
+                            });
+                        }
+                    });
+                } else {
+                    usersList.innerHTML = '<li>No users registered</li>';
+                }
+            }).catch(error => alert('Failed to retrieve users: ' + error.message));
+        }
+
+        let dashboardChart; // Global variable to hold the chart instance
+
+        // Update Dashboard Chart
+        function updateDashboardChart() {
+            const labels = ['Books', 'Users'];
+            const data = [0, 0]; // Array to store book and user counts
+
+            // Retrieve number of books
+            get(child(ref(database), 'books')).then(snapshot => {
+                if (snapshot.exists()) {
+                    data[0] = snapshot.size; // Number of books
+                }
+
+                // Retrieve number of users
+                return get(child(ref(database), 'users'));
+            }).then(snapshot => {
+                if (snapshot.exists()) {
+                    data[1] = snapshot.size; // Number of users
+                }
+
+                // If a chart instance already exists, destroy it
+                if (dashboardChart) {
+                    dashboardChart.destroy();
+                }
+
+                // Render the new chart
+                const ctx = document.getElementById('dashboardChart').getContext('2d');
+                dashboardChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Counts',
+                            data: data,
+                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }).catch(error => alert('Failed to update chart: ' + error.message));
+        }
 
         // Navigation
         function navigateToSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
             document.getElementById(sectionId).style.display = 'block';
+
+            // Load chart data only if navigating to the Dashboard
+            if (sectionId === 'Dashboard') {
+                updateDashboardChart(); // Ensure chart is loaded when clicking on the Dashboard
+            }
+
             history.pushState(null, '', `#${sectionId}`);
         }
 
         window.addEventListener('popstate', () => {
-            const sectionId = location.hash.substring(1) || 'dashboard';
+            const sectionId = location.hash.substring(1) || 'Dashboard';
             navigateToSection(sectionId);
         });
 
@@ -338,10 +535,21 @@
             });
         });
 
+        function checkAuthentication() {
+            if (!sessionStorage.getItem('loggedIn')) {
+                // If not logged in, redirect to the SignIn.html page
+                window.location.href = 'SignIn.html';
+            }
+        }
+
+        // Event listeners for dynamic search
+        document.getElementById('searchBookInput').addEventListener('input', displayBooks);
+        document.getElementById('searchUserInput').addEventListener('input', displayUsers);
+
         // Load Data on Page Load
         window.addEventListener('load', () => {
             checkAuthentication();
-            const sectionId = location.hash.substring(1) || 'dashboard';
+            const sectionId = location.hash.substring(1) || 'Dashboard';
             navigateToSection(sectionId);
             updateDashboardChart();
             displayBooks();
