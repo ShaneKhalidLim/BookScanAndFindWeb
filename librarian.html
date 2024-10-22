@@ -156,57 +156,58 @@
             });
         });
 
-        // Add Book
         document.getElementById('submitBook').addEventListener('click', () => {
-            const bookId = document.getElementById('book_id').value.trim();
-            const bookTitle = document.getElementById('book_title').value;
-            const bookAuthor = document.getElementById('book_author').value;
-            const bookDescription = document.getElementById('book_description').value;
-            const bookCategory = document.getElementById('book_category').value;
-            const bookCallNumber = document.getElementById('book_callnumber').value;
-            const bookBarcode = document.getElementById('book_barcode').value;
-            const bookShelfNumber = document.getElementById('book_shelfNumber').value;
-            const bookShelfRow = document.getElementById('book_shelfRow').value;
-            const bookShelfColumn = document.getElementById('book_shelfColumn').value;
-            const bookImg = document.getElementById('book_img').files[0];
+    const bookId = document.getElementById('book_id').value.trim();
+    const bookTitle = document.getElementById('book_title').value;
+    const bookAuthor = document.getElementById('book_author').value;
+    const bookDescription = document.getElementById('book_description').value;
+    const bookCategory = document.getElementById('book_category').value;
+    const bookCallNumber = document.getElementById('book_callnumber').value;
+    const bookBarcode = document.getElementById('book_barcode').value;
+    const bookShelfNumber = document.getElementById('book_shelfNumber').value;
+    const bookShelfRow = document.getElementById('book_shelfRow').value;
+    const bookShelfColumn = document.getElementById('book_shelfColumn').value;
+    const bookImg = document.getElementById('book_img').files[0];
 
-            if (bookId && bookTitle && bookAuthor && bookDescription && bookCategory && bookCallNumber && bookBarcode && bookShelfNumber && bookShelfRow && bookShelfColumn && bookImg) {
-                const storageReference = storageRef(storage, 'book_images/' + bookId);
-                
-                uploadBytes(storageReference, bookImg)
-                    .then(snapshot => getDownloadURL(snapshot.ref))
-                    .then(url => set(ref(database, 'books/' + bookId), {
-                        title: bookTitle,
-                        author: bookAuthor,
-                        description: bookDescription,
-                        category: bookCategory,
-                        callnumber: bookCallNumber,
-                        barcode: bookBarcode,
-                        shelfNumber: parseInt(bookShelfNumber),
-                        shelfRow: parseInt(bookShelfRow),
-                        shelfColumn: parseInt(bookShelfColumn),
-                        imageURL: url
-                    }))
-                    .then(() => {
-                        alert('Book added successfully');
-                        // Clear input fields after success
-                        document.getElementById('book_id').value = '';
-                        document.getElementById('book_img').value = '';
-                        document.getElementById('book_title').value = '';
-                        document.getElementById('book_author').value = '';
-                        document.getElementById('book_description').value = '';
-                        document.getElementById('book_category').value = '';
-                        document.getElementById('book_callnumber').value = '';
-                        document.getElementById('book_barcode').value = '';
-                        document.getElementById('book_shelfNumber').value = '';
-                        document.getElementById('book_shelfRow').value = '';
-                        document.getElementById('book_shelfColumn').value = '';
-                    })
-                    .catch(error => alert('Failed to add book: ' + error.message));
-            } else {
-                alert('All fields are required');
-            }
-        });
+    if (bookId && bookTitle && bookAuthor && bookDescription && bookCategory && bookCallNumber && bookBarcode && bookShelfNumber && bookShelfRow && bookShelfColumn && bookImg) {
+        const storageReference = storageRef(storage, 'book_images/' + bookId);
+        
+        uploadBytes(storageReference, bookImg)
+            .then(snapshot => getDownloadURL(snapshot.ref))
+            .then(url => set(ref(database, 'books/' + bookId), {
+                id: bookId, // Add the id field here
+                title: bookTitle,
+                author: bookAuthor,
+                description: bookDescription,
+                category: bookCategory,
+                callnumber: bookCallNumber,
+                barcode: bookBarcode,
+                shelfNumber: parseInt(bookShelfNumber),
+                shelfRow: parseInt(bookShelfRow),
+                shelfColumn: parseInt(bookShelfColumn),
+                imageURL: url
+            }))
+            .then(() => {
+                alert('Book added successfully');
+                // Clear input fields after success
+                document.getElementById('book_id').value = '';
+                document.getElementById('book_img').value = '';
+                document.getElementById('book_title').value = '';
+                document.getElementById('book_author').value = '';
+                document.getElementById('book_description').value = '';
+                document.getElementById('book_category').value = '';
+                document.getElementById('book_callnumber').value = '';
+                document.getElementById('book_barcode').value = '';
+                document.getElementById('book_shelfNumber').value = '';
+                document.getElementById('book_shelfRow').value = '';
+                document.getElementById('book_shelfColumn').value = '';
+            })
+            .catch(error => alert('Failed to add book: ' + error.message));
+    } else {
+        alert('All fields are required');
+    }
+});
+
 
         // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
