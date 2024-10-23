@@ -3,20 +3,21 @@
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid #a67c52; /* Warm brown border */
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 16px;
     transition: border-color 0.3s ease;
+    background-color: #f5f1e3; /* Light parchment background */
 }
 
 .modern-input:focus {
-    border-color: #007bff;
+    border-color: #6b4226; /* Darker brown on focus */
     outline: none;
 }
 
 .modern-button {
-    background-color: #007bff;
+    background-color: #6b4226; /* Dark brown */
     color: white;
     padding: 12px 20px;
     border: none;
@@ -27,12 +28,12 @@
 }
 
 .modern-button:hover {
-    background-color: #0056b3;
+    background-color: #4e2f1e; /* Even darker brown on hover */
 }
 
 /* Add School and Librarian Section Styling */
 #addSchool, #addLibrarian {
-    background: #ffffff;
+    background: #f5f1e3; /* Light parchment background */
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -42,7 +43,7 @@
 
 #addSchool h2, #addLibrarian h2 {
     margin-bottom: 20px;
-    color: #333;
+    color: #4e2f1e; /* Dark brown */
     font-size: 24px;
     font-weight: 600;
 }
@@ -55,22 +56,12 @@ body {
     height: 100vh;
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f4;
+    background: linear-gradient(to bottom, #ece2d0, #bfa48d); /* Warm gradient background */
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #954535, #2575fc);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+/* Login Box Styling */
 #login-box {
-    background: white;
+    background: #f5f1e3; /* Light parchment */
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 300px;
@@ -82,32 +73,8 @@ body {
 
 .left h1 {
     margin: 0 0 20px 0;
-    color: #333;
+    color: #4e2f1e; /* Dark brown */
 }
-
-.left input[type="text"],
-.left input[type="password"],
-.left input[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.left input[type="submit"] {
-    background: #6a11cb;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.left input[type="submit"]:hover {
-    background: #2575fc;
-}
-
 .wrapper {
     display: flex;
     width: 100%;
@@ -116,7 +83,7 @@ body {
 
 #navbar {
     width: 220px;
-    background-color: #2c3e50;
+    background-color: #4e2f1e;
     color: white;
     padding: 20px;
     position: fixed;
@@ -135,14 +102,18 @@ body {
     letter-spacing: 1px;
 }
 
-#navbar ul {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0 0;
+#navbar ul li a {
+    color: #f5f1e3;
+    text-decoration: none;
+    font-size: 20px; /* Larger font size */
+    display: block;
+    padding: 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-#navbar ul li {
-    margin: 15px 0;
+#navbar ul li a:hover {
+    background-color: #6b4226;
 }
 
 #navbar ul li a {
@@ -162,11 +133,41 @@ body {
 
 #main {
     flex: 1;
-    padding: 20px;
-    margin-left: 250px;
-    background-color: #ecf0f1;
+    padding: 30px; /* Increase padding */
+    margin-left: 280px; /* Adjust margin to accommodate larger navbar */
+    background-color: #ece2d0;
     overflow-y: auto;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1); /* Larger shadow */
+}
+
+.school-item, .librarian-item, .user-item, .book-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(33.333% - 30px); /* Adjust for responsiveness */
+    margin-bottom: 30px;
+    padding: 25px; /* Larger padding */
+    background-color: #f5f1e3;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15); /* Larger shadow */
+    transition: transform 0.3s;
+}
+
+.school-item:hover, .librarian-item:hover, .user-item:hover, .book-item:hover {
+    transform: scale(1.05); /* Increase scale effect */
+}
+
+.school-item img, .librarian-item img, .user-item img, .book-item img {
+    width: 100%;
+    height: 300px; /* Increase height */
+    object-fit: contain;
+    border-radius: 10px 10px 0 0;
+}
+
+.details {
+    font-size: 18px; /* Larger font size */
+    color: #4e2f1e;
+    padding: 20px 0; /* Increase padding */
+    text-align: center;
 }
 
 .section {
@@ -200,7 +201,7 @@ h2 {
     flex: 1 1 calc(33.333% - 20px); /* Adjust this percentage for the number of items per row */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #C4A484;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -320,7 +321,7 @@ li {
     flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #C4A484;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -351,7 +352,7 @@ li {
     flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #C4A484;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -375,6 +376,26 @@ li {
     text-align: center;
     line-height: 1.6;
 }
+#image{
+    width: 100px;
+    height: 100px;
+}
 
-/* The settings buttons and menu styling remain the same */
+
+.image {
+    width: 500px; /* Increase the size for a bigger image */
+    max-width: 100%; /* Ensure responsiveness */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    margin-left: 400px;
+    margin-top: 200px;
+}
+
+/* Hover effect */
+.image:hover {
+    transform: scale(1.05); /* Slightly enlarge on hover */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
+}
+
 
