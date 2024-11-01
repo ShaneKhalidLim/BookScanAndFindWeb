@@ -356,55 +356,77 @@
 
         // Display Books
         function displayBooks() {
-            const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
-            const booksList = document.getElementById('booksList');
-            booksList.innerHTML = '';
+    const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
+    const booksList = document.getElementById('booksList');
+    booksList.innerHTML = '';
 
-            get(child(ref(database), 'books')).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const book = childSnapshot.val();
-                        const bookId = childSnapshot.key;
+    get(child(ref(database), 'books')).then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const book = childSnapshot.val();
+                const bookId = childSnapshot.key;
 
-                        if (book.title.toLowerCase().includes(searchQuery) || 
-                            book.author.toLowerCase().includes(searchQuery)) {
-                            
-                            const listItem = document.createElement('li');
-                            listItem.className = 'book-item';
-                            listItem.dataset.id = bookId;
-                            listItem.innerHTML = `
-                                <img src="${book.imageURL}" alt="Book Image">
-                                <div class="details">${book.title}<br>${book.author}</div>
-                                <div class="settings">
-                                    <button class="settings-button">&#x22EE;</button>
-                                    <div class="settings-menu">
-                                        <button class="edit">Edit</button>
-                                    </div>
-                                </div>
-                            `;
-                            booksList.appendChild(listItem);
+                // Check if the book title or author matches the search query
+                if (book.title.toLowerCase().includes(searchQuery) || 
+                    book.author.toLowerCase().includes(searchQuery)) {
+                    
+                    const listItem = document.createElement('li');
+                    listItem.className = 'book-item';
+                    listItem.dataset.id = bookId;
+                    
+                    // Apply a visual style for disabled books
+                    listItem.innerHTML = `
+                        <img src="${book.imageURL}" alt="Book Image">
+                        <div class="details">
+                            ${book.title} <br> ${book.author}
+                            ${book.bookStatus === 'Disabled' ? '<span class="disabled-tag">(Disabled)</span>' : ''}
+                        </div>
+                        <div class="settings">
+                            <button class="settings-button">&#x22EE;</button>
+                            <div class="settings-menu">
+                                <button class="edit">Edit</button>
+                                <button class="disable">${book.bookStatus === 'Disabled' ? 'Enable Book' : 'Disable Book'}</button> <!-- Toggle button -->
+                            </div>
+                        </div>
+                    `;
+                    
+                    booksList.appendChild(listItem);
 
-                            listItem.querySelector('.edit').addEventListener('click', () => {
-                                currentEditingBookId = bookId;
-                                document.getElementById('edit_book_id').value = bookId;
-                                document.getElementById('edit_book_title').value = book.title;
-                                document.getElementById('edit_book_author').value = book.author;
-                                document.getElementById('edit_book_description').value = book.description;
-                                document.getElementById('edit_book_category').value = book.category;
-                                document.getElementById('edit_book_callnumber').value = book.callnumber;
-                                document.getElementById('edit_book_barcode').value = book.barcode;
-                                document.getElementById('edit_book_shelfNumber').value = book.shelfNumber;
-                                document.getElementById('edit_book_shelfRow').value = book.shelfRow;
-                                document.getElementById('edit_book_shelfColumn').value = book.shelfColumn;
-                                navigateToSection('editBook');
-                            });
+                    // Edit Book event listener
+                    listItem.querySelector('.edit').addEventListener('click', () => {
+                        currentEditingBookId = bookId;
+                        document.getElementById('edit_book_id').value = bookId;
+                        document.getElementById('edit_book_title').value = book.title;
+                        document.getElementById('edit_book_author').value = book.author;
+                        document.getElementById('edit_book_description').value = book.description;
+                        document.getElementById('edit_book_category').value = book.category;
+                        document.getElementById('edit_book_callnumber').value = book.callnumber;
+                        document.getElementById('edit_book_barcode').value = book.barcode;
+                        document.getElementById('edit_book_shelfNumber').value = book.shelfNumber;
+                        document.getElementById('edit_book_shelfRow').value = book.shelfRow;
+                        document.getElementById('edit_book_shelfColumn').value = book.shelfColumn;
+                        navigateToSection('editBook');
+                    });
+
+                    // Disable/Enable Book event listener
+                    listItem.querySelector('.disable').addEventListener('click', () => {
+                        const newStatus = book.bookStatus === 'Disabled' ? 'Available' : 'Disabled';
+                        if (confirm(`Are you sure you want to ${newStatus === 'Disabled' ? 'disable' : 'enable'} this book?`)) {
+                            update(ref(database, 'books/' + bookId), { bookStatus: newStatus })
+                                .then(() => {
+                                    alert(`Book has been ${newStatus === 'Disabled' ? 'disabled' : 'enabled'}.`);
+                                    displayBooks(); // Refresh the book list
+                                })
+                                .catch(error => alert(`Failed to ${newStatus === 'Disabled' ? 'disable' : 'enable'} book: ` + error.message));
                         }
                     });
-                } else {
-                    booksList.innerHTML = '<li>No books registered</li>';
                 }
-            }).catch(error => alert('Failed to retrieve books: ' + error.message));
+            });
+        } else {
+            booksList.innerHTML = '<li>No books registered</li>';
         }
+    }).catch(error => alert('Failed to retrieve books: ' + error.message));
+}
 
         // Display Users
         function displayUsers() {
