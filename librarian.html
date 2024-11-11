@@ -32,22 +32,30 @@
                 <canvas id="dashboardChart" width="400" height="200"></canvas>
             </div>
             <!-- Add Book Section -->
-            <div id="addBook" class="section">
-                <h2>Add Book</h2>
-                <input type="text" id="book_id" placeholder="Book ID" class="modern-input"> <!-- Book ID Field -->
-                <input type="file" id="book_img" class="modern-input">
-                <input type="text" id="book_title" placeholder="Book Title" class="modern-input">
-                <input type="text" id="book_author" placeholder="Author" class="modern-input">
-                <textarea id="book_description" placeholder="Description" class="modern-input"></textarea>
-                <input type="text" id="book_category" placeholder="Category" class="modern-input">
-                <input type="text" id="book_callnumber" placeholder="Call Number" class="modern-input">
-                <input type="text" id="book_barcode" placeholder="Barcode" class="modern-input">
-                <input type="number" id="book_shelfNumber" placeholder="Shelf Number" class="modern-input">
-                <input type="number" id="book_shelfRow" placeholder="Shelf Row" class="modern-input">
-                <input type="number" id="book_shelfColumn" placeholder="Shelf Column" class="modern-input">
-                <button id="submitBook" class="modern-button">Add Book</button>
-            </div>
-
+        <div id="addBook" class="section">
+            <h2>Add Book</h2>
+            <input type="text" id="book_id" placeholder="Book ID" class="modern-input"> <!-- Book ID Field -->
+            <input type="file" id="book_img" class="modern-input">
+            <input type="text" id="book_title" placeholder="Book Title" class="modern-input">
+            <input type="text" id="book_author" placeholder="Author" class="modern-input">
+            <textarea id="book_description" placeholder="Description" class="modern-input"></textarea>
+            <input type="text" id="book_category" placeholder="Category" class="modern-input">
+            <input type="text" id="book_callnumber" placeholder="Call Number" class="modern-input">
+            <input type="text" id="book_barcode" placeholder="Barcode" class="modern-input">
+            <input type="number" id="book_shelfNumber" placeholder="Shelf Number" class="modern-input">
+            <input type="number" id="book_shelfRow" placeholder="Shelf Row" class="modern-input">
+            <input type="number" id="book_shelfColumn" placeholder="Shelf Column" class="modern-input">
+            
+            <!-- Book Status Dropdown -->
+            <select id="book_status" class="modern-input">
+                <option value="">Select Status</option>
+                <option value="Available">Available</option>
+                <option value="Unavailable">Unavailable</option>
+                <option value="Disabled">Disabled</option>
+            </select>
+            
+            <button id="submitBook" class="modern-button">Add Book</button>
+        </div> 
             <!-- Edit Book Section -->
             <div id="editBook" class="section">
                 <h2>Edit Book</h2>
@@ -87,6 +95,41 @@
                 <input type="text" id="user_middleinitial" placeholder="Middle Initial (optional)" class="modern-input">
                 <input type="password" id="user_password" placeholder="Password" class="modern-input">
                 <input type="text" id="user_contactnumber" placeholder="Contact Number" class="modern-input">
+                
+                <!-- Course Dropdown -->
+                <select id="user_course" class="modern-input">
+                    <option value="">Select Course</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Nursing">Nursing</option>
+                    <option value="Health Aide">Health Aide</option>
+                    <option value="Caregiver Course">Caregiver Course</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Information Management">Information Management</option>
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Electronics and Communications Engineering">Electronics and Communications Engineering</option>
+                    <option value="Elementary Education">Elementary Education</option>
+                    <option value="Secondary Education">Secondary Education</option>
+                    <option value="Criminology">Criminology</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Accountancy">Accountancy</option>
+                    <option value="Hotel and Restaurant Management">Hotel and Restaurant Management</option>
+                    <option value="Tourism">Tourism</option>
+                    <option value="Customs Administration">Customs Administration</option>
+                    <option value="Computer Secretarial">Computer Secretarial</option>
+                    <option value="Law">Law</option>
+                    <!-- Add more course options as needed -->
+                </select>
+
+                <!-- Year Dropdown -->
+                <select id="user_year" class="modern-input">
+                    <option value="">Select Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+                
                 <button id="submitUser" class="modern-button">Add User</button>
             </div>
 
@@ -101,22 +144,110 @@
                 <input type="text" id="edit_user_middleinitial" placeholder="Middle Initial (optional)" class="modern-input">
                 <input type="password" id="edit_user_password" placeholder="Password" class="modern-input">
                 <input type="text" id="edit_user_contactnumber" placeholder="Contact Number" class="modern-input">
+                
+                <!-- Course Dropdown -->
+                <select id="edit_user_course" class="modern-input">
+                    <option value="">Select Course</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Nursing">Nursing</option>
+                    <option value="Health Aide">Health Aide</option>
+                    <option value="Caregiver Course">Caregiver Course</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Information Management">Information Management</option>
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Electronics and Communications Engineering">Electronics and Communications Engineering</option>
+                    <option value="Elementary Education">Elementary Education</option>
+                    <option value="Secondary Education">Secondary Education</option>
+                    <option value="Criminology">Criminology</option>
+                    <option value="Commerce">Commerce</option>
+                    <option value="Accountancy">Accountancy</option>
+                    <option value="Hotel and Restaurant Management">Hotel and Restaurant Management</option>
+                    <option value="Tourism">Tourism</option>
+                    <option value="Customs Administration">Customs Administration</option>
+                    <option value="Computer Secretarial">Computer Secretarial</option>
+                    <option value="Law">Law</option>
+                    <!-- Add more course options as needed -->
+                </select>
+
+                <!-- Year Dropdown -->
+                <select id="edit_user_year" class="modern-input">
+                    <option value="">Select Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+                
                 <button id="updateUser" class="modern-button">Update User</button>
             </div>
 
-            <!-- Display Books Section -->
+
+            <!-- Display Books Section with Filters -->
             <div id="displayBooks" class="section">
                 <h2>Registered Books</h2>
-                <input type="text" id="searchBookInput" placeholder="Search Books" class="modern-search-input">
+                <div class="filters">
+                    <input type="text" id="searchBookInput" placeholder="Search Books" class="modern-search-input">
+                    <select id="bookCategoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Science">Science</option>
+                        <option value="History">History</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Romance">Romance</option>
+                        <!-- Add more categories as needed -->
+                    </select>
+                    <select id="bookStatusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Available">Available</option>
+                        <option value="Unavailable">Unavailable</option>
+                        <option value="Disabled">Disabled</option>
+                    </select>
+                </div>
                 <ul id="booksList"></ul>
             </div>
 
-            <!-- Display Users Section -->
+            <!-- Display Users Section with Filters -->
             <div id="displayUsers" class="section">
                 <h2>Registered Users</h2>
-                <input type="text" id="searchUserInput" placeholder="Search Users" class="modern-search-input">
+                <div class="filters">
+                    <input type="text" id="searchUserInput" placeholder="Search Users" class="modern-search-input">
+                    <select id="userCourseFilter">
+                        <option value="">All Courses</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Nursing">Nursing</option>
+                        <option value="Health Aide">Health Aide</option>
+                        <option value="Caregiver Course">Caregiver Course</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Information Management">Information Management</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Electronics and Communications Engineering">Electronics and Communications Engineering</option>
+                        <option value="Elementary Education">Elementary Education</option>
+                        <option value="Secondary Education">Secondary Education</option>
+                        <option value="Criminology">Criminology</option>
+                        <option value="Commerce">Commerce</option>
+                        <option value="Accountancy">Accountancy</option>
+                        <option value="Hotel and Restaurant Management">Hotel and Restaurant Management</option>
+                        <option value="Tourism">Tourism</option>
+                        <option value="Customs Administration">Customs Administration</option>
+                        <option value="Computer Secretarial">Computer Secretarial</option>
+                        <option value="Law">Law</option>
+                        <!-- Add more course options as needed -->
+                    </select>
+                    <select id="userYearFilter">
+                        <option value="">All Years</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
                 <ul id="usersList"></ul>
             </div>
+
+
         </div>
     </div>
 
@@ -157,59 +288,75 @@
         });
 
         document.getElementById('submitBook').addEventListener('click', () => {
-    const bookId = document.getElementById('book_id').value.trim();
-    const bookTitle = document.getElementById('book_title').value;
-    const bookAuthor = document.getElementById('book_author').value;
-    const bookDescription = document.getElementById('book_description').value;
-    const bookCategory = document.getElementById('book_category').value;
-    const bookCallNumber = document.getElementById('book_callnumber').value;
-    const bookBarcode = document.getElementById('book_barcode').value;
-    const bookShelfNumber = document.getElementById('book_shelfNumber').value;
-    const bookShelfRow = document.getElementById('book_shelfRow').value;
-    const bookShelfColumn = document.getElementById('book_shelfColumn').value;
-    const bookImg = document.getElementById('book_img').files[0];
+            const bookId = document.getElementById('book_id').value.trim();
+            const bookTitle = document.getElementById('book_title').value.trim();
+            const bookAuthor = document.getElementById('book_author').value.trim();
+            const bookDescription = document.getElementById('book_description').value.trim();
+            const bookCategory = document.getElementById('book_category').value.trim();
+            const bookCallNumber = document.getElementById('book_callnumber').value.trim();
+            const bookBarcode = document.getElementById('book_barcode').value.trim();
+            const bookShelfNumber = document.getElementById('book_shelfNumber').value;
+            const bookShelfRow = document.getElementById('book_shelfRow').value;
+            const bookShelfColumn = document.getElementById('book_shelfColumn').value;
+            const bookStatus = document.getElementById('book_status').value;
+            const bookImg = document.getElementById('book_img').files[0];
 
-    if (bookId && bookTitle && bookAuthor && bookDescription && bookCategory && bookCallNumber && bookBarcode && bookShelfNumber && bookShelfRow && bookShelfColumn && bookImg) {
-        const storageReference = storageRef(storage, 'book_images/' + bookId);
-        
-        uploadBytes(storageReference, bookImg)
-            .then(snapshot => getDownloadURL(snapshot.ref))
-            .then(url => set(ref(database, 'books/' + bookId), {
-                id: bookId, // Add the id field here
-                title: bookTitle,
-                author: bookAuthor,
-                description: bookDescription,
-                category: bookCategory,
-                callnumber: bookCallNumber,
-                barcode: bookBarcode,
-                shelfNumber: parseInt(bookShelfNumber),
-                shelfRow: parseInt(bookShelfRow),
-                shelfColumn: parseInt(bookShelfColumn),
-                imageURL: url
-            }))
-            .then(() => {
-                alert('Book added successfully');
-                // Clear input fields after success
-                document.getElementById('book_id').value = '';
-                document.getElementById('book_img').value = '';
-                document.getElementById('book_title').value = '';
-                document.getElementById('book_author').value = '';
-                document.getElementById('book_description').value = '';
-                document.getElementById('book_category').value = '';
-                document.getElementById('book_callnumber').value = '';
-                document.getElementById('book_barcode').value = '';
-                document.getElementById('book_shelfNumber').value = '';
-                document.getElementById('book_shelfRow').value = '';
-                document.getElementById('book_shelfColumn').value = '';
-            })
-            .catch(error => alert('Failed to add book: ' + error.message));
-    } else {
-        alert('All fields are required');
-    }
-});
+            // Validate all required fields are filled
+            if (!bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory || 
+                !bookCallNumber || !bookBarcode || !bookShelfNumber || !bookShelfRow || !bookShelfColumn || 
+                !bookStatus || !bookImg) {
+                alert('Please fill out all fields and select an image.');
+                return;
+            }
 
+            // Validate that a valid status is selected
+            if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
+                alert('Please select a valid status.');
+                return;
+            }
 
-        // Add User
+            // Reference to the storage and database paths
+            const storageReference = storageRef(storage, 'book_images/' + bookId);
+
+            // Upload the book image
+            uploadBytes(storageReference, bookImg)
+                .then(snapshot => getDownloadURL(snapshot.ref))
+                .then(url => {
+                    // Set book data in the Firebase database
+                    return set(ref(database, 'books/' + bookId), {
+                        id: bookId,
+                        title: bookTitle,
+                        author: bookAuthor,
+                        description: bookDescription,
+                        category: bookCategory,
+                        callnumber: bookCallNumber,
+                        barcode: bookBarcode,
+                        shelfNumber: bookShelfNumber.toString(),
+                        shelfRow: bookShelfRow.toString(),
+                        shelfColumn: bookShelfColumn.toString(),
+                        bookStatus: bookStatus,
+                        imageURL: url
+                    });
+                })
+                .then(() => {
+                    alert('Book added successfully.');
+                    // Clear input fields after success
+                    document.getElementById('book_id').value = '';
+                    document.getElementById('book_img').value = '';
+                    document.getElementById('book_title').value = '';
+                    document.getElementById('book_author').value = '';
+                    document.getElementById('book_description').value = '';
+                    document.getElementById('book_category').value = '';
+                    document.getElementById('book_callnumber').value = '';
+                    document.getElementById('book_barcode').value = '';
+                    document.getElementById('book_shelfNumber').value = '';
+                    document.getElementById('book_shelfRow').value = '';
+                    document.getElementById('book_shelfColumn').value = '';
+                    document.getElementById('book_status').value = '';
+                })
+                .catch(error => alert('Failed to add book: ' + error.message));
+        });
+
         document.getElementById('submitUser').addEventListener('click', () => {
             const userId = document.getElementById('user_id').value.trim();
             const userSchoolId = document.getElementById('user_schoolid').value.trim();
@@ -218,20 +365,25 @@
             const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
             const userPassword = document.getElementById('user_password').value;
             const userContactNumber = document.getElementById('user_contactnumber').value.trim();
+            const userCourse = document.getElementById('user_course').value.trim(); // Course Field
+            const userYear = document.getElementById('user_year').value; // Year Dropdown
             const userImg = document.getElementById('user_img').files[0];
 
-            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber && userImg) {
+            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber && userCourse && userYear && userImg) {
                 const storageReference = storageRef(storage, 'user_images/' + userId);
 
                 uploadBytes(storageReference, userImg)
                     .then(snapshot => getDownloadURL(snapshot.ref))
                     .then(url => set(ref(database, 'users/' + userId), {
+                        userId: userId, // Explicitly include userId here as part of the data
                         schoolId: userSchoolId,
                         lastName: userLastName,
                         firstName: userFirstName,
                         middleInitial: userMiddleInitial,
                         password: userPassword,
                         contactNumber: userContactNumber,
+                        course: userCourse,
+                        year: userYear,
                         profileImageUrl: url
                     }))
                     .then(() => {
@@ -244,6 +396,8 @@
                         document.getElementById('user_middleinitial').value = "";
                         document.getElementById('user_password').value = "";
                         document.getElementById('user_contactnumber').value = "";
+                        document.getElementById('user_course').value = ""; // Clear Course Field
+                        document.getElementById('user_year').value = ""; // Clear Year Dropdown
                         document.getElementById('user_img').value = "";
                     })
                     .catch(error => alert("Error creating user. Please try again."));
@@ -252,185 +406,158 @@
             }
         });
 
-        // Update Book
+
         document.getElementById('updateBook').addEventListener('click', () => {
             const bookId = currentEditingBookId;
-            const bookTitle = document.getElementById('edit_book_title').value;
-            const bookAuthor = document.getElementById('edit_book_author').value;
-            const bookDescription = document.getElementById('edit_book_description').value;
-            const bookCategory = document.getElementById('edit_book_category').value;
-            const bookCallNumber = document.getElementById('edit_book_callnumber').value;
-            const bookBarcode = document.getElementById('edit_book_barcode').value;
-            const bookShelfNumber = document.getElementById('edit_book_shelfNumber').value;
-            const bookShelfRow = document.getElementById('edit_book_shelfRow').value;
-            const bookShelfColumn = document.getElementById('edit_book_shelfColumn').value;
-            const bookImg = document.getElementById('edit_book_img').files[0];
-
-            if (bookId && bookTitle && bookAuthor && bookDescription && bookCategory && bookCallNumber && bookBarcode && bookShelfNumber && bookShelfRow && bookShelfColumn) {
-                const bookData = {
-                    title: bookTitle,
-                    author: bookAuthor,
-                    description: bookDescription,
-                    category: bookCategory,
-                    callnumber: bookCallNumber,
-                    barcode: bookBarcode,
-                    shelfNumber: parseInt(bookShelfNumber),
-                    shelfRow: parseInt(bookShelfRow),
-                    shelfColumn: parseInt(bookShelfColumn)
-                };
-
-                if (bookImg) {
-                    const storageReference = storageRef(storage, 'book_images/' + bookId);
-
-                    uploadBytes(storageReference, bookImg)
-                        .then(snapshot => getDownloadURL(snapshot.ref))
-                        .then(url => {
-                            bookData.imageURL = url;
-                            return update(ref(database, 'books/' + bookId), bookData);
-                        })
-                        .then(() => {
-                            alert('Book updated successfully');
-                            navigateToSection('displayBooks');
-                        })
-                        .catch(error => alert('Failed to update book: ' + error.message));
-                } else {
-                    update(ref(database, 'books/' + bookId), bookData)
-                        .then(() => {
-                            alert('Book updated successfully');
-                            navigateToSection('displayBooks');
-                        })
-                        .catch(error => alert('Failed to update book: ' + error.message));
-                }
-            } else {
-                alert('All fields are required');
+            if (!bookId) {
+                console.error("Error: currentEditingBookId is not set.");
+                alert("Error: Book ID is missing. Please try again.");
+                return;
             }
+
+            // Convert shelf fields to integers
+            const bookData = {
+                title: document.getElementById('edit_book_title').value,
+                author: document.getElementById('edit_book_author').value,
+                description: document.getElementById('edit_book_description').value,
+                category: document.getElementById('edit_book_category').value,
+                callnumber: document.getElementById('edit_book_callnumber').value,
+                barcode: document.getElementById('edit_book_barcode').value,
+                shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
+                shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
+                shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
+            };
+
+            // Check if shelf values are valid numbers
+            if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
+                alert("Please enter valid numbers for the shelf fields.");
+                return;
+            }
+
+            console.log("Updating book with data:", bookData);
+
+            // Perform the update in Firebase
+            update(ref(database, 'books/' + bookId), bookData)
+                .then(() => {
+                    alert('Book updated successfully');
+                    console.log("Firebase update successful:", bookData);
+                    window.location.href = `bookDetails.html?id=${bookId}`;
+                })
+                .catch(error => {
+                    console.error("Firebase update failed:", error.message);
+                    alert('Failed to update book: ' + error.message);
+                });
         });
 
-        // Update User
         document.getElementById('updateUser').addEventListener('click', () => {
-            const userId = currentEditingUserId;
+            const userId = currentEditingUserId; // Ensure userId is set correctly
             const userSchoolId = document.getElementById('edit_user_schoolid').value.trim();
             const userLastName = document.getElementById('edit_user_lastname').value.trim();
             const userFirstName = document.getElementById('edit_user_firstname').value.trim();
-            const userMiddleInitial = document.getElementById('edit_user_middleinitial').value.trim();
             const userPassword = document.getElementById('edit_user_password').value;
             const userContactNumber = document.getElementById('edit_user_contactnumber').value.trim();
-            const userImg = document.getElementById('edit_user_img').files[0];
+            const userCourse = document.getElementById('edit_user_course').value.trim();
+            const userYear = document.getElementById('edit_user_year').value;
+            const userMiddleInitial = document.getElementById('edit_user_middleinitial').value.trim();
+            const userImg = document.getElementById('edit_user_img').files[0]; // Optional image
 
-            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber) {
-                const userData = {
-                    schoolId: userSchoolId,
-                    lastName: userLastName,
-                    firstName: userFirstName,
-                    middleInitial: userMiddleInitial,
-                    password: userPassword,
-                    contactNumber: userContactNumber
-                };
+            // Prepare userData object with only non-empty fields
+            const userData = {
+                schoolId: userSchoolId || null,
+                lastName: userLastName || null,
+                firstName: userFirstName || null,
+                password: userPassword || null,
+                contactNumber: userContactNumber || null,
+                course: userCourse || null,
+                year: userYear || null
+            };
 
-                if (userImg) {
-                    const storageReference = storageRef(storage, 'user_images/' + userId);
+            // Include middleInitial only if provided
+            if (userMiddleInitial) {
+                userData.middleInitial = userMiddleInitial;
+            }
 
-                    uploadBytes(storageReference, userImg)
-                        .then(snapshot => getDownloadURL(snapshot.ref))
-                        .then(url => {
-                            userData.profileImageUrl = url;
-                            return update(ref(database, 'users/' + userId), userData);
-                        })
-                        .then(() => {
-                            alert('User updated successfully');
-                            navigateToSection('displayUsers');
-                        })
-                        .catch(error => alert('Failed to update user: ' + error.message));
-                } else {
-                    update(ref(database, 'users/' + userId), userData)
-                        .then(() => {
-                            alert('User updated successfully');
-                            navigateToSection('displayUsers');
-                        })
-                        .catch(error => alert('Failed to update user: ' + error.message));
-                }
+            // If there's an image, upload and update profileImageUrl1 and profileImageUrl2
+            if (userImg) {
+                const storageReference1 = storageRef(storage, 'profile_images/' + userId);
+                const storageReference2 = storageRef(storage, 'profileImages/' + userId);
+
+                // Upload to first path and update profileImageUrl1
+                uploadBytes(storageReference1, userImg)
+                    .then(snapshot => getDownloadURL(snapshot.ref))
+                    .then(url1 => {
+                        userData.profileImageUrl1 = url1;
+
+                        // Upload to second path and update profileImageUrl2
+                        return uploadBytes(storageReference2, userImg).then(snapshot => getDownloadURL(snapshot.ref));
+                    })
+                    .then(url2 => {
+                        userData.profileImageUrl2 = url2;
+
+                        // Update in Firebase
+                        return update(ref(database, 'users/' + userId), userData);
+                    })
+                    .then(() => {
+                        alert('User updated successfully');
+                        navigateToSection('displayUsers');
+                    })
+                    .catch(error => alert('Failed to update user: ' + error.message));
             } else {
-                alert('All fields are required');
+                // If no image, update Firebase directly
+                update(ref(database, 'users/' + userId), userData)
+                    .then(() => {
+                        alert('User updated successfully');
+                        navigateToSection('displayUsers');
+                    })
+                    .catch(error => alert('Failed to update user: ' + error.message));
             }
         });
 
-        // Display Books
+        // Display Books (without settings menu)
         function displayBooks() {
-    const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
-    const booksList = document.getElementById('booksList');
-    booksList.innerHTML = '';
+            const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('bookCategoryFilter').value;
+            const statusFilter = document.getElementById('bookStatusFilter').value;
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
 
-    get(child(ref(database), 'books')).then(snapshot => {
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const book = childSnapshot.val();
-                const bookId = childSnapshot.key;
+            get(child(ref(database), 'books')).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const book = childSnapshot.val();
+                        const bookId = childSnapshot.key;
 
-                // Check if the book title or author matches the search query
-                if (book.title.toLowerCase().includes(searchQuery) || 
-                    book.author.toLowerCase().includes(searchQuery)) {
-                    
-                    const listItem = document.createElement('li');
-                    listItem.className = 'book-item';
-                    listItem.dataset.id = bookId;
-                    
-                    // Apply a visual style for disabled books
-                    listItem.innerHTML = `
-                        <img src="${book.imageURL}" alt="Book Image">
-                        <div class="details">
-                            ${book.title} <br> ${book.author}
-                            ${book.bookStatus === 'Disabled' ? '<span class="disabled-tag">(Disabled)</span>' : ''}
-                        </div>
-                        <div class="settings">
-                            <button class="settings-button">&#x22EE;</button>
-                            <div class="settings-menu">
-                                <button class="edit">Edit</button>
-                                <button class="disable">${book.bookStatus === 'Disabled' ? 'Enable Book' : 'Disable Book'}</button> <!-- Toggle button -->
-                            </div>
-                        </div>
-                    `;
-                    
-                    booksList.appendChild(listItem);
+                        const matchesSearch = book.title.toLowerCase().includes(searchQuery) || 
+                                              book.author.toLowerCase().includes(searchQuery);
+                        const matchesCategory = !categoryFilter || book.category === categoryFilter;
+                        const matchesStatus = !statusFilter || book.bookStatus === statusFilter;
 
-                    // Edit Book event listener
-                    listItem.querySelector('.edit').addEventListener('click', () => {
-                        currentEditingBookId = bookId;
-                        document.getElementById('edit_book_id').value = bookId;
-                        document.getElementById('edit_book_title').value = book.title;
-                        document.getElementById('edit_book_author').value = book.author;
-                        document.getElementById('edit_book_description').value = book.description;
-                        document.getElementById('edit_book_category').value = book.category;
-                        document.getElementById('edit_book_callnumber').value = book.callnumber;
-                        document.getElementById('edit_book_barcode').value = book.barcode;
-                        document.getElementById('edit_book_shelfNumber').value = book.shelfNumber;
-                        document.getElementById('edit_book_shelfRow').value = book.shelfRow;
-                        document.getElementById('edit_book_shelfColumn').value = book.shelfColumn;
-                        navigateToSection('editBook');
-                    });
+                        if (matchesSearch && matchesCategory && matchesStatus) {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'book-item';
+                            listItem.dataset.id = bookId;
+                            listItem.innerHTML = `
+                                <img src="${book.imageURL}" alt="Book Image">
+                                <div class="details">${book.title} <br> ${book.author}</div>
+                            `;
+                            booksList.appendChild(listItem);
 
-                    // Disable/Enable Book event listener
-                    listItem.querySelector('.disable').addEventListener('click', () => {
-                        const newStatus = book.bookStatus === 'Disabled' ? 'Available' : 'Disabled';
-                        if (confirm(`Are you sure you want to ${newStatus === 'Disabled' ? 'disable' : 'enable'} this book?`)) {
-                            update(ref(database, 'books/' + bookId), { bookStatus: newStatus })
-                                .then(() => {
-                                    alert(`Book has been ${newStatus === 'Disabled' ? 'disabled' : 'enabled'}.`);
-                                    displayBooks(); // Refresh the book list
-                                })
-                                .catch(error => alert(`Failed to ${newStatus === 'Disabled' ? 'disable' : 'enable'} book: ` + error.message));
+                            listItem.querySelector('img').addEventListener('click', () => {
+                                window.location.href = `bookDetails.html?id=${bookId}`;
+                            });
                         }
                     });
+                } else {
+                    booksList.innerHTML = '<li>No books registered</li>';
                 }
-            });
-        } else {
-            booksList.innerHTML = '<li>No books registered</li>';
+            }).catch(error => alert('Failed to retrieve books: ' + error.message));
         }
-    }).catch(error => alert('Failed to retrieve books: ' + error.message));
-}
 
-        // Display Users
+        // Display Users (without settings menu)
         function displayUsers() {
             const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
+            const courseFilter = document.getElementById('userCourseFilter').value;
+            const yearFilter = document.getElementById('userYearFilter').value;
             const usersList = document.getElementById('usersList');
             usersList.innerHTML = '';
 
@@ -440,37 +567,21 @@
                         const user = childSnapshot.val();
                         const userId = childSnapshot.key;
 
-                        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-                        const contactNumber = user.contactNumber || 'No Contact Number';
-                        const profileImageUrl = user.profileImageUrl || 'default-user.png';
+                        const matchesSearch = `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery);
+                        const matchesCourse = !courseFilter || user.course === courseFilter;
+                        const matchesYear = !yearFilter || user.year === yearFilter;
 
-                        if (fullName.toLowerCase().includes(searchQuery) || contactNumber.toLowerCase().includes(searchQuery)) {
+                        if (matchesSearch && matchesCourse && matchesYear) {
                             const listItem = document.createElement('li');
                             listItem.className = 'user-item';
                             listItem.dataset.id = userId;
                             listItem.innerHTML = `
-                                <img src="${profileImageUrl}" alt="User Image">
-                                <div class="details">${fullName}<br>${contactNumber}</div>
-                                <div class="settings">
-                                    <button class="settings-button">&#x22EE;</button>
-                                    <div class="settings-menu">
-                                        <button class="edit">Edit</button>
-                                    </div>
-                                </div>
+                                <a href="userDetails.html?id=${userId}">
+                                    <img src="${user.profileImageUrl}" alt="User Image">
+                                    <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
+                                </a>
                             `;
                             usersList.appendChild(listItem);
-
-                            listItem.querySelector('.edit').addEventListener('click', () => {
-                                currentEditingUserId = userId;
-                                document.getElementById('edit_user_id').value = userId;
-                                document.getElementById('edit_user_schoolid').value = user.schoolId;
-                                document.getElementById('edit_user_lastname').value = user.lastName;
-                                document.getElementById('edit_user_firstname').value = user.firstName;
-                                document.getElementById('edit_user_middleinitial').value = user.middleInitial || '';
-                                document.getElementById('edit_user_password').value = user.password;
-                                document.getElementById('edit_user_contactnumber').value = user.contactNumber;
-                                navigateToSection('editUser');
-                            });
                         }
                     });
                 } else {
@@ -478,6 +589,15 @@
                 }
             }).catch(error => alert('Failed to retrieve users: ' + error.message));
         }
+        // Event listeners for filters and search
+        document.getElementById('userCourseFilter').addEventListener('change', displayUsers);
+        document.getElementById('userYearFilter').addEventListener('change', displayUsers);
+        document.getElementById('searchUserInput').addEventListener('input', displayUsers);
+
+        // Event listeners for filters and search
+        document.getElementById('bookCategoryFilter').addEventListener('change', displayBooks);
+        document.getElementById('bookStatusFilter').addEventListener('change', displayBooks);
+        document.getElementById('searchBookInput').addEventListener('input', displayBooks);
 
         let dashboardChart; // Global variable to hold the chart instance
 
@@ -528,6 +648,73 @@
                 });
             }).catch(error => alert('Failed to update chart: ' + error.message));
         }
+        
+        function loadEditingBookData() {
+            const bookData = JSON.parse(sessionStorage.getItem("editingBookData"));
+            if (bookData) {
+                currentEditingBookId = bookData.id; // Set the global editing book ID
+                console.log("Loading book for editing with ID:", bookData.id);
+
+                // Populate the form with existing book data
+                document.getElementById('edit_book_id').value = bookData.id;
+                document.getElementById('edit_book_title').value = bookData.title;
+                document.getElementById('edit_book_author').value = bookData.author;
+                document.getElementById('edit_book_description').value = bookData.description;
+                document.getElementById('edit_book_category').value = bookData.category;
+                document.getElementById('edit_book_callnumber').value = bookData.callnumber;
+                document.getElementById('edit_book_barcode').value = bookData.barcode;
+                document.getElementById('edit_book_shelfNumber').value = bookData.shelfNumber;
+                document.getElementById('edit_book_shelfRow').value = bookData.shelfRow;
+                document.getElementById('edit_book_shelfColumn').value = bookData.shelfColumn;
+            } else {
+                alert("No book data found for editing.");
+                console.error("Error: No book data found in sessionStorage.");
+            }
+        }
+
+        function prepareUserForEditing(user) {
+            // Create an object with user data and include uid
+            const userData = {
+                userId: user.uid, // uid as identifier
+                schoolId: user.schoolId,
+                lastName: user.lastName,
+                firstName: user.firstName,
+                middleInitial: user.middleInitial,
+                password: user.password,
+                contactNumber: user.contactNumber,
+                course: user.course,
+                year: user.year
+            };
+
+            // Save the userData (including uid as userId) to sessionStorage
+            sessionStorage.setItem("editingUserData", JSON.stringify(userData));
+
+            // Navigate to the edit user section
+            navigateToSection('editUser');
+        }
+
+
+        function loadEditingUserData() {
+            const userData = JSON.parse(sessionStorage.getItem("editingUserData"));
+            if (userData) {
+                currentEditingUserId = userData.userId; // Set the global editing user ID
+                console.log("Loading user for editing with ID:", userData.userId);
+
+                // Populate the form with existing user data
+                document.getElementById('edit_user_id').value = userData.userId;
+                document.getElementById('edit_user_schoolid').value = userData.schoolId;
+                document.getElementById('edit_user_lastname').value = userData.lastName;
+                document.getElementById('edit_user_firstname').value = userData.firstName;
+                document.getElementById('edit_user_middleinitial').value = userData.middleInitial || "";
+                document.getElementById('edit_user_password').value = userData.password;
+                document.getElementById('edit_user_contactnumber').value = userData.contactNumber;
+                document.getElementById('edit_user_course').value = userData.course;
+                document.getElementById('edit_user_year').value = userData.year;
+            } else {
+                alert("No user data found for editing.");
+                console.error("Error: No user data found in sessionStorage.");
+            }
+        }
 
         // Navigation
         function navigateToSection(sectionId) {
@@ -537,6 +724,13 @@
             // Load chart data only if navigating to the Dashboard
             if (sectionId === 'Dashboard') {
                 updateDashboardChart(); // Ensure chart is loaded when clicking on the Dashboard
+            }
+
+            if (sectionId === 'editBook') {
+            loadEditingBookData();
+            }
+            else if (sectionId === 'editUser') {
+                loadEditingUserData();
             }
 
             history.pushState(null, '', `#${sectionId}`);

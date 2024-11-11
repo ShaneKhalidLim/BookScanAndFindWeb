@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - BookScan&Find</title>
+    <style>
+        /* Styling for the Book Details page */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #f2e8dc; color: #4b2e2e; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .container { max-width: 700px; width: 100%; background-color: #e3d5c7; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); padding: 30px; margin-bottom: 20px; }
+        h1 { font-size: 28px; color: #6f4e37; margin-bottom: 20px; text-align: center; }
+        .details-section { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .details-section h2 { font-size: 22px; color: #4b2e2e; margin-bottom: 15px; }
+        .details-section p { font-size: 18px; line-height: 1.6; color: #5f4b3d; margin: 8px 0; }
+        .details-section strong { color: #6f4e37; }
+        .details-section img { width: 260px; height: auto; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        .button-group { display: flex; gap: 15px; }
+        button { flex: 1; padding: 12px 20px; font-size: 16px; background-color: #6f4e37; color: #fff; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; text-align: center; }
+        button:hover { background-color: #5a3f2b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Book Details</h1>
+        <div id="bookDetails" class="details-section"></div>
+        <div class="button-group">
+            <button id="editButton">Edit</button>
+            <button id="toggleStatusButton">Disable/Enable</button>
+            <button onclick="window.history.back()">Go Back</button>
+        </div>
+        
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+            import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDmTgqh5EXrrtRDJYSY6MvVE5gD7pwJfOE",
+                authDomain: "bookscanandfind.firebaseapp.com",
+                databaseURL: "https://bookscanandfind-default-rtdb.firebaseio.com",
+                projectId: "bookscanandfind",
+                storageBucket: "bookscanandfind.appspot.com",
+                messagingSenderId: "214479740973",
+                appId: "1:214479740973:web:cb437a5a4d9f22cdff18a4",
+                measurementId: "G-MFXHQWH2Y3"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const database = getDatabase(app);
+
+            let bookData;
+
+            function getBookIdFromURL() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get("id");
+            }
+
+            function displayBookDetails(bookId) {
+                get(child(ref(database), 'books/' + bookId)).then(snapshot => {
+                    if (snapshot.exists()) {
+                        bookData = snapshot.val();
+                        document.getElementById('bookDetails').innerHTML = `
+                            <h2>${bookData.title}</h2>
+                            <img src="${bookData.imageURL}" alt="Book Image">
+                            <p><strong>Author:</strong> ${bookData.author}</p>
+                            <p><strong>Description:</strong> ${bookData.description}</p>
+                            <p><strong>Category:</strong> ${bookData.category}</p>
+                            <p><strong>Call Number:</strong> ${bookData.callnumber}</p>
+                            <p><strong>Barcode:</strong> ${bookData.barcode}</p>
+                            <p><strong>Shelf Location:</strong> ${bookData.shelfNumber}-${bookData.shelfRow}-${bookData.shelfColumn}</p>
+                            <p><strong>Status:</strong> ${bookData.bookStatus}</p>
+                        `;
+                    } else {
+                        document.getElementById('bookDetails').innerHTML = '<p>Book not found.</p>';
+                    }
+                }).catch(error => alert('Failed to retrieve book details: ' + error.message));
+            }
+
+            function editBook() {
+                if (!bookData || !bookData.id) {
+                    alert("Book data is not available.");
+                    return;
+                }
+                sessionStorage.setItem("editingBookData", JSON.stringify(bookData));
+                window.location.href = "librarian.html#editBook";
+            }
+
+            function toggleBookStatus() {
+                if (!bookData || !bookData.id) {
+                    alert("Book data is not available.");
+                    return;
+                }
+
+                const newStatus = bookData.bookStatus === "Disabled" ? "Available" : "Disabled";
+                update(ref(database, 'books/' + bookData.id), { bookStatus: newStatus })
+                    .then(() => {
+                        alert(`Book status updated to ${newStatus}`);
+                        displayBookDetails(bookData.id); // Refresh details
+                    })
+                    .catch(error => alert('Failed to update book status: ' + error.message));
+            }
+
+            // Attach event listeners to the buttons
+            document.getElementById('editButton').addEventListener('click', editBook);
+            document.getElementById('toggleStatusButton').addEventListener('click', toggleBookStatus);
+
+            const bookId = getBookIdFromURL();
+            if (bookId) displayBookDetails(bookId);
+        </script>
+    </div>
+</body>
+</html>
