@@ -281,7 +281,7 @@
         document.getElementById('logout').addEventListener('click', () => {
             signOut(auth).then(() => {
                 sessionStorage.removeItem('loggedIn');
-                window.location.href = 'signin.html';
+                window.location.href = 'index.html';
             }).catch(error => {
                 alert('Logout failed: ' + error.message);
             });
@@ -755,7 +755,7 @@
         function checkAuthentication() {
             if (!sessionStorage.getItem('loggedIn')) {
                 // If not logged in, redirect to the SignIn.html page
-                window.location.href = 'SignIn.html';
+                window.location.href = 'index.html';
             }
         }
 
