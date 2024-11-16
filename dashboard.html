@@ -135,16 +135,16 @@
             }
         }
 
-        // Logout Functionality
         document.getElementById('logout').addEventListener('click', () => {
             signOut(auth).then(() => {
                 // Clear session and redirect to sign-in page
                 sessionStorage.removeItem('loggedIn');
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // Redirect to the renamed file
             }).catch(error => {
                 alert('Logout failed: ' + error.message);
             });
         });
+
         
         // Add School
         document.getElementById('submitSchool').addEventListener('click', () => {

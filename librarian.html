@@ -277,15 +277,16 @@
         let currentEditingBookId = null;
         let currentEditingUserId = null;
 
-        // Logout Functionality
         document.getElementById('logout').addEventListener('click', () => {
             signOut(auth).then(() => {
                 sessionStorage.removeItem('loggedIn');
-                window.location.href = 'index.html';
+                // Ensure correct path
+                window.location.href = './index.html';
             }).catch(error => {
                 alert('Logout failed: ' + error.message);
             });
         });
+
 
         document.getElementById('submitBook').addEventListener('click', () => {
             const bookId = document.getElementById('book_id').value.trim();
