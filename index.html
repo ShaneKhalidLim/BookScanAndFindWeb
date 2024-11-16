@@ -3,57 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A sample website deployed on GitHub Pages">
-    <title>My Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        header {
-            background: #333;
-            color: #fff;
-            padding: 1rem;
-        }
-        section {
-            margin: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        footer {
-            background: #333;
-            color: #fff;
-            padding: 1rem;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-        }
-        a {
-            color: #007BFF;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>BookScan&Find - Sign In</title>
+    <link rel="stylesheet" href="app.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
-    <section>
-        <p>This is a simple website hosted on GitHub Pages.</p>
-        <p>Edit this file to customize your site!</p>
-        <p>Visit <a href="https://github.com/">GitHub</a> for more information.</p>
-    </section>
-    <footer>
-        <p>© 2024 Your Name. All rights reserved.</p>
-    </footer>
+    <div id="login-box">
+        <div class="left">
+            <h1>Sign In</h1>
+            <input type="text" class="modern-input" id="email" name="email" placeholder="Email" />
+            <input type="password" class="modern-input" id="password" name="password" placeholder="Password" />
+            <input type="submit" class="modern-button" id="login" name="login" value="Login" />
+        </div>
+    </div>
+
+    <div class="image-container">
+        <img class="image" src="Images/BookScanAndFind Logo.png" alt="BookScan&Find Logo" />
+    </div>
+
+    <script type="module">
+        // Firebase configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmTgqh5EXrrtRDJYSY6MvVE5gD7pwJfOE",
+            authDomain: "bookscanandfind.firebaseapp.com",
+            databaseURL: "https://bookscanandfind-default-rtdb.firebaseio.com",
+            projectId: "bookscanandfind",
+            storageBucket: "bookscanandfind.appspot.com",
+            messagingSenderId: "214479740973",
+            appId: "1:214479740973:web:cb437a5a4d9f22cdff18a4",
+            measurementId: "G-MFXHQWH2Y3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Redirect if already logged in
+        if (sessionStorage.getItem('loggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Login event listener
+        // Login event listener
+document.getElementById('login').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!email || !password) {
+        alert('Please enter both email and password.');
+        return;
+    }
+
+    try {
+        // Check if the user is an Admin in Realtime Database
+        const adminRef = ref(database, 'Admin');
+        const adminSnapshot = await get(adminRef);
+
+        if (adminSnapshot.exists()) {
+            let adminFound = false;
+
+            // Loop through the admin entries to find a match for email
+            adminSnapshot.forEach(childSnapshot => {
+                const admin = childSnapshot.val();
+                if (admin.email === email) {
+                    adminFound = true;
+                    sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+                    // Redirect to admin dashboard
+                    window.location.href = 'dashboard.html';
+                }
+            });
+
+            if (adminFound) {
+                return; // Stop further execution if admin is found
+            }
+        }
+
+        // If not an admin, check if the user is a Librarian
+        const librariansRef = ref(database, 'librarians');
+        const librarianSnapshot = await get(librariansRef);
+
+        if (librarianSnapshot.exists()) {
+            let librarianFound = false;
+
+            // Loop through the librarian entries to find a match for email and password
+            librarianSnapshot.forEach(childSnapshot => {
+                const librarian = childSnapshot.val();
+                if (librarian.email === email && librarian.password === password) {
+                    librarianFound = true;
+                    sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+                    // Redirect to librarian dashboard
+                    window.location.href = 'librarian.html';
+                }
+            });
+
+            if (!librarianFound) {
+                alert('Email or password is incorrect.');
+            }
+        } else {
+            alert('No librarians found.');
+        }
+    } catch (error) {
+        // Handle error, such as network issues
+        alert(`Error: ${error.message}`);
+    }
+});
+
+    </script>
 </body>
 </html>
