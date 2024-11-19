@@ -89,6 +89,10 @@
                 <h2>Add User</h2>
                 <input type="text" id="user_id" placeholder="User ID" class="modern-input"> <!-- User ID Field -->
                 <input type="file" id="user_img" class="modern-input">
+                 <!-- School Dropdown -->
+                <select id="user_school_select" class="modern-input">
+                    <option value="" disabled selected>Select School</option>
+                </select>
                 <input type="text" id="user_schoolid" placeholder="School ID" class="modern-input">
                 <input type="text" id="user_lastname" placeholder="Last Name" class="modern-input">
                 <input type="text" id="user_firstname" placeholder="First Name" class="modern-input">
@@ -138,6 +142,10 @@
                 <h2>Edit User</h2>
                 <input type="text" id="edit_user_id" placeholder="User ID" class="modern-input" readonly>
                 <input type="file" id="edit_user_img" class="modern-input">
+                <!-- School Dropdown -->
+                <select id="edit_user_school_select" class="modern-input">
+                    <option value="" disabled selected>Select School</option>
+                </select>
                 <input type="text" id="edit_user_schoolid" placeholder="School ID" class="modern-input">
                 <input type="text" id="edit_user_lastname" placeholder="Last Name" class="modern-input">
                 <input type="text" id="edit_user_firstname" placeholder="First Name" class="modern-input">
@@ -450,9 +458,57 @@
                 });
         });
 
+                // Populate school dropdowns
+        function populateSchoolDropdowns() {
+            const schoolSelectAdd = document.getElementById('user_school_select');
+            const schoolSelectEdit = document.getElementById('edit_user_school_select');
+
+            // Clear existing options
+            schoolSelectAdd.innerHTML = '<option value="" disabled selected>Select School</option>';
+            schoolSelectEdit.innerHTML = '<option value="" disabled selected>Select School</option>';
+
+            // Fetch schools from Firebase
+            get(child(ref(database), 'schools'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const school = childSnapshot.val();
+                            const option = document.createElement('option');
+                            option.value = school.name; // Use the school name as the value
+                            option.textContent = school.name; // Display the school name
+                            schoolSelectAdd.appendChild(option);
+                            schoolSelectEdit.appendChild(option);
+                        });
+                    } else {
+                        console.log('No schools found in the database.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch schools:', error);
+                });
+        }
+
+        // Call the function to populate dropdowns on page load
+        window.addEventListener('load', populateSchoolDropdowns);
+
+        // Modify Add User to Save Selected School
+        document.getElementById('submitUser').addEventListener('click', () => {
+            const schoolName = document.getElementById('user_school_select').value; // Get selected school name
+
+            // Include schoolName in the user data
+            const userData = {
+                // Other fields
+                schoolname: schoolName, // Save the selected school name
+            };
+
+            // Save userData to Firebase...
+        });
+
+
         document.getElementById('updateUser').addEventListener('click', () => {
             const userId = currentEditingUserId; // Ensure userId is set correctly
             const userSchoolId = document.getElementById('edit_user_schoolid').value.trim();
+            const schoolName = document.getElementById('edit_user_school_select').value; // Get selected school name
             const userLastName = document.getElementById('edit_user_lastname').value.trim();
             const userFirstName = document.getElementById('edit_user_firstname').value.trim();
             const userPassword = document.getElementById('edit_user_password').value;
@@ -465,6 +521,7 @@
             // Prepare userData object with only non-empty fields
             const userData = {
                 schoolId: userSchoolId || null,
+                schoolname: schoolName,
                 lastName: userLastName || null,
                 firstName: userFirstName || null,
                 password: userPassword || null,
