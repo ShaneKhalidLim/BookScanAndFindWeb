@@ -191,12 +191,11 @@
             </div>
 
 
-            <!-- Display Books Section with Filters -->
             <div id="displayBooks" class="section">
                 <h2>Registered Books</h2>
                 <div class="filters">
                     <input type="text" id="searchBookInput" placeholder="Search Books" class="modern-search-input">
-                    <select id="bookCategoryFilter">
+                    <select id="bookCategoryFilter" class="modern-input">
                         <option value="">All Categories</option>
                         <option value="Fiction">Fiction</option>
                         <option value="Non-Fiction">Non-Fiction</option>
@@ -204,9 +203,8 @@
                         <option value="History">History</option>
                         <option value="Horror">Horror</option>
                         <option value="Romance">Romance</option>
-                        <!-- Add more categories as needed -->
                     </select>
-                    <select id="bookStatusFilter">
+                    <select id="bookStatusFilter" class="modern-input">
                         <option value="">All Statuses</option>
                         <option value="Available">Available</option>
                         <option value="Unavailable">Unavailable</option>
@@ -215,13 +213,12 @@
                 </div>
                 <ul id="booksList"></ul>
             </div>
-
-            <!-- Display Users Section with Filters -->
+            
             <div id="displayUsers" class="section">
                 <h2>Registered Users</h2>
                 <div class="filters">
                     <input type="text" id="searchUserInput" placeholder="Search Users" class="modern-search-input">
-                    <select id="userCourseFilter">
+                    <select id="userCourseFilter" class="modern-input">
                         <option value="">All Courses</option>
                         <option value="Computer Science">Computer Science</option>
                         <option value="Engineering">Engineering</option>
@@ -242,9 +239,8 @@
                         <option value="Customs Administration">Customs Administration</option>
                         <option value="Computer Secretarial">Computer Secretarial</option>
                         <option value="Law">Law</option>
-                        <!-- Add more course options as needed -->
                     </select>
-                    <select id="userYearFilter">
+                    <select id="userYearFilter" class="modern-input">
                         <option value="">All Years</option>
                         <option value="1">1st Year</option>
                         <option value="2">2nd Year</option>
@@ -254,6 +250,7 @@
                 </div>
                 <ul id="usersList"></ul>
             </div>
+            
 
 
         </div>
@@ -366,54 +363,48 @@
                 .catch(error => alert('Failed to add book: ' + error.message));
         });
 
-        document.getElementById('submitUser').addEventListener('click', () => {
-            const userId = document.getElementById('user_id').value.trim();
-            const userSchoolId = document.getElementById('user_schoolid').value.trim();
-            const userLastName = document.getElementById('user_lastname').value.trim();
-            const userFirstName = document.getElementById('user_firstname').value.trim();
-            const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
-            const userPassword = document.getElementById('user_password').value;
-            const userContactNumber = document.getElementById('user_contactnumber').value.trim();
-            const userCourse = document.getElementById('user_course').value.trim(); // Course Field
-            const userYear = document.getElementById('user_year').value; // Year Dropdown
-            const userImg = document.getElementById('user_img').files[0];
+        function populateSchoolDropdowns() {
+            const schoolSelectAdd = document.getElementById('user_school_select');
+            const schoolSelectEdit = document.getElementById('edit_user_school_select');
 
-            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber && userCourse && userYear && userImg) {
-                const storageReference = storageRef(storage, 'user_images/' + userId);
+            // Clear existing options
+            schoolSelectAdd.innerHTML = '<option value="" disabled selected>Select School</option>';
+            schoolSelectEdit.innerHTML = '<option value="" disabled selected>Select School</option>';
 
-                uploadBytes(storageReference, userImg)
-                    .then(snapshot => getDownloadURL(snapshot.ref))
-                    .then(url => set(ref(database, 'users/' + userId), {
-                        userId: userId, // Explicitly include userId here as part of the data
-                        schoolId: userSchoolId,
-                        lastName: userLastName,
-                        firstName: userFirstName,
-                        middleInitial: userMiddleInitial,
-                        password: userPassword,
-                        contactNumber: userContactNumber,
-                        course: userCourse,
-                        year: userYear,
-                        profileImageUrl: url
-                    }))
-                    .then(() => {
-                        alert('User added successfully!');
-                        // Clear input fields after success
-                        document.getElementById('user_id').value = "";
-                        document.getElementById('user_schoolid').value = "";
-                        document.getElementById('user_lastname').value = "";
-                        document.getElementById('user_firstname').value = "";
-                        document.getElementById('user_middleinitial').value = "";
-                        document.getElementById('user_password').value = "";
-                        document.getElementById('user_contactnumber').value = "";
-                        document.getElementById('user_course').value = ""; // Clear Course Field
-                        document.getElementById('user_year').value = ""; // Clear Year Dropdown
-                        document.getElementById('user_img').value = "";
-                    })
-                    .catch(error => alert("Error creating user. Please try again."));
-            } else {
-                alert('Please fill out all fields and select an image.');
-            }
-        });
+            // Fetch schools from Firebase
+            get(child(ref(database), 'schools'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        console.log('Schools data fetched:', snapshot.val()); // Log data for debugging
+                        snapshot.forEach(childSnapshot => {
+                            const school = childSnapshot.val();
+
+                            // Create an option element for the 'Add User' dropdown
+                            const addOption = document.createElement('option');
+                            addOption.value = school.name; // Use the school name as the value
+                            addOption.textContent = school.name; // Display the school name
+                            schoolSelectAdd.appendChild(addOption);
+
+                            // Create a separate option element for the 'Edit User' dropdown
+                            const editOption = document.createElement('option');
+                            editOption.value = school.name;
+                            editOption.textContent = school.name;
+                            schoolSelectEdit.appendChild(editOption);
+                        });
+                    } else {
+                        console.log('No schools found in the database.');
+                        alert('No schools found in the database.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch schools:', error);
+                    alert('Unable to fetch schools. Please check the database or your connection.');
+                });
+    }
+
+        // Call this function on page load
+        window.addEventListener('load', populateSchoolDropdowns);
+
 
 
         document.getElementById('updateBook').addEventListener('click', () => {
@@ -457,53 +448,6 @@
                     alert('Failed to update book: ' + error.message);
                 });
         });
-
-                // Populate school dropdowns
-        function populateSchoolDropdowns() {
-            const schoolSelectAdd = document.getElementById('user_school_select');
-            const schoolSelectEdit = document.getElementById('edit_user_school_select');
-
-            // Clear existing options
-            schoolSelectAdd.innerHTML = '<option value="" disabled selected>Select School</option>';
-            schoolSelectEdit.innerHTML = '<option value="" disabled selected>Select School</option>';
-
-            // Fetch schools from Firebase
-            get(child(ref(database), 'schools'))
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        snapshot.forEach(childSnapshot => {
-                            const school = childSnapshot.val();
-                            const option = document.createElement('option');
-                            option.value = school.name; // Use the school name as the value
-                            option.textContent = school.name; // Display the school name
-                            schoolSelectAdd.appendChild(option);
-                            schoolSelectEdit.appendChild(option);
-                        });
-                    } else {
-                        console.log('No schools found in the database.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to fetch schools:', error);
-                });
-        }
-
-        // Call the function to populate dropdowns on page load
-        window.addEventListener('load', populateSchoolDropdowns);
-
-        // Modify Add User to Save Selected School
-        document.getElementById('submitUser').addEventListener('click', () => {
-            const schoolName = document.getElementById('user_school_select').value; // Get selected school name
-
-            // Include schoolName in the user data
-            const userData = {
-                // Other fields
-                schoolname: schoolName, // Save the selected school name
-            };
-
-            // Save userData to Firebase...
-        });
-
 
         document.getElementById('updateUser').addEventListener('click', () => {
             const userId = currentEditingUserId; // Ensure userId is set correctly

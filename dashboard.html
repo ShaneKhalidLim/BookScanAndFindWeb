@@ -75,13 +75,33 @@
             <div id="displayLibrarians" class="section">
                 <h2>Registered Librarians</h2>
                 <input type="text" id="searchLibrarianInput" placeholder="Search Librarians" class="modern-search-input">
-                <ul id="librariansList"></ul>
+                <!-- School Filter Dropdown -->
+            <select id="librarianSchoolFilter" class="modern-input">
+                <option value="">All Schools</option>
+            </select>
+            <!-- Role Filter Dropdown -->
+            <select id="librarianRoleFilter" class="modern-input">
+                <option value="">All Roles</option>
+                <option value="Head Librarian">Head Librarian</option>
+                <option value="Assistant Librarian">Assistant Librarian</option>
+                <option value="Library Staff">Library Staff</option>
+            </select>
+                    <ul id="librariansList"></ul>
             </div>
 
             <!-- Display Users Section -->
             <div id="displayUsers" class="section">
                 <h2>Registered Users</h2>
                 <input type="text" id="searchUserInput" placeholder="Search Users" class="modern-search-input">
+                <select id="userCourseFilter" class="modern-input">
+                    <option value="">All Courses</option>
+                </select>
+                <select id="userYearFilter" class="modern-input">
+                    <option value="">All Years</option>
+                </select>
+                <select id="userSchoolFilter" class="modern-input">
+                    <option value="">All Schools</option>
+                </select>
                 <ul id="usersList"></ul>
             </div>
 
@@ -168,38 +188,36 @@
             });
         });
 
-    function populateSchoolDropdown() {
-    const schoolSelect = document.getElementById('lib_school_select');
+        function populateSchoolDropdown() {
+        const schoolSelect = document.getElementById('lib_school_select');
 
-    // Reset the dropdown options
-    schoolSelect.innerHTML = '<option value="" disabled selected>Select School</option>';
+        // Reset the dropdown options
+        schoolSelect.innerHTML = '<option value="" disabled selected>Select School</option>';
 
-    // Fetch schools from the database
-    get(child(ref(database), 'schools'))
-        .then(snapshot => {
-            if (snapshot.exists()) {
-                console.log("Schools fetched successfully:", snapshot.val()); // Debug log
-                snapshot.forEach(childSnapshot => {
-                    const school = childSnapshot.val();
-                    const option = document.createElement('option');
-                    option.value = school.name; // Use school name as value
-                    option.textContent = school.name; // Display school name
-                    schoolSelect.appendChild(option);
-                });
-            } else {
-                console.log('No schools found in the database.'); // Debug log
-                alert('No schools available to select.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching schools:', error); // Debug log
-            alert('Failed to fetch schools: ' + error.message);
-        });
-}
-
-// Call this function on page load
-window.addEventListener('load', populateSchoolDropdown);
-
+        // Fetch schools from the database
+        get(child(ref(database), 'schools'))
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    console.log("Schools fetched successfully:", snapshot.val()); // Debug log
+                    snapshot.forEach(childSnapshot => {
+                        const school = childSnapshot.val();
+                        const option = document.createElement('option');
+                        option.value = school.name; // Use school name as value
+                        option.textContent = school.name; // Display school name
+                        schoolSelect.appendChild(option);
+                    });
+                } else {
+                    console.log('No schools found in the database.'); // Debug log
+                    alert('No schools available to select.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching schools:', error); // Debug log
+                alert('Failed to fetch schools: ' + error.message);
+            });
+    }
+        // Call this function on page load
+        window.addEventListener('load', populateSchoolDropdown);
 
         // Add School
         document.getElementById('submitSchool').addEventListener('click', () => {
@@ -235,71 +253,71 @@ window.addEventListener('load', populateSchoolDropdown);
         });
 
         document.getElementById('submitLibrarian').addEventListener('click', () => {
-    const libId = document.getElementById('lib_id').value.trim();
-    const schoolId = document.getElementById('lib_school_id').value.trim(); // Inputted School ID
-    const schoolName = document.getElementById('lib_school_select').value; // Selected School Name
-    const libLastName = document.getElementById('lib_lastname').value.trim();
-    const libFirstName = document.getElementById('lib_firstname').value.trim();
-    const libMiddleInitial = document.getElementById('lib_middleinitial').value.trim();
-    const libPassword = document.getElementById('lib_password').value.trim();
-    const libContactNum = document.getElementById('lib_contactnum').value.trim();
-    const libRole = document.getElementById('lib_role').value.trim();
-    const libEmail = document.getElementById('lib_email').value.trim();
-    const libImg = document.getElementById('lib_img').files[0];
+            const libId = document.getElementById('lib_id').value.trim();
+            const schoolId = document.getElementById('lib_school_id').value.trim(); // Inputted School ID
+            const schoolName = document.getElementById('lib_school_select').value; // Selected School Name
+            const libLastName = document.getElementById('lib_lastname').value.trim();
+            const libFirstName = document.getElementById('lib_firstname').value.trim();
+            const libMiddleInitial = document.getElementById('lib_middleinitial').value.trim();
+            const libPassword = document.getElementById('lib_password').value.trim();
+            const libContactNum = document.getElementById('lib_contactnum').value.trim();
+            const libRole = document.getElementById('lib_role').value.trim();
+            const libEmail = document.getElementById('lib_email').value.trim();
+            const libImg = document.getElementById('lib_img').files[0];
 
-    if (
-        libId &&
-        schoolId &&
-        schoolName &&
-        libLastName &&
-        libFirstName &&
-        libPassword &&
-        libContactNum &&
-        libRole &&
-        libEmail &&
-        libImg
-    ) {
-        const storageReference = storageRef(storage, 'librarian_images/' + libId);
+            if (
+                libId &&
+                schoolId &&
+                schoolName &&
+                libLastName &&
+                libFirstName &&
+                libPassword &&
+                libContactNum &&
+                libRole &&
+                libEmail &&
+                libImg
+            ) {
+                const storageReference = storageRef(storage, 'librarian_images/' + libId);
 
-        uploadBytes(storageReference, libImg)
-            .then(snapshot => getDownloadURL(snapshot.ref))
-            .then(url => {
-                const librarianData = {
-                    id: libId,
-                    schoolId: schoolId, // Save the inputted School ID
-                    schoolName: schoolName, // Save the selected School Name
-                    lastName: libLastName,
-                    firstName: libFirstName,
-                    middleInitial: libMiddleInitial,
-                    contactNum: libContactNum,
-                    role: libRole,
-                    email: libEmail,
-                    password: libPassword,
-                    imageUrl: url,
-                };
+                uploadBytes(storageReference, libImg)
+                    .then(snapshot => getDownloadURL(snapshot.ref))
+                    .then(url => {
+                        const librarianData = {
+                            id: libId,
+                            schoolId: schoolId, // Save the inputted School ID
+                            schoolName: schoolName, // Save the selected School Name
+                            lastName: libLastName,
+                            firstName: libFirstName,
+                            middleInitial: libMiddleInitial,
+                            contactNum: libContactNum,
+                            role: libRole,
+                            email: libEmail,
+                            password: libPassword,
+                            imageUrl: url,
+                        };
 
-                return set(ref(database, 'librarians/' + libId), librarianData);
-            })
-            .then(() => {
-                alert('Librarian added successfully!');
-                // Reset fields
-                document.getElementById('lib_id').value = '';
-                document.getElementById('lib_school_id').value = '';
-                document.getElementById('lib_school_select').value = '';
-                document.getElementById('lib_lastname').value = '';
-                document.getElementById('lib_firstname').value = '';
-                document.getElementById('lib_middleinitial').value = '';
-                document.getElementById('lib_password').value = '';
-                document.getElementById('lib_contactnum').value = '';
-                document.getElementById('lib_role').value = '';
-                document.getElementById('lib_email').value = '';
-                document.getElementById('lib_img').value = '';
-            })
-            .catch(error => alert('Error adding librarian: ' + error.message));
-    } else {
-        alert('Please fill out all fields.');
-    }
-});
+                        return set(ref(database, 'librarians/' + libId), librarianData);
+                    })
+                    .then(() => {
+                        alert('Librarian added successfully!');
+                        // Reset fields
+                        document.getElementById('lib_id').value = '';
+                        document.getElementById('lib_school_id').value = '';
+                        document.getElementById('lib_school_select').value = '';
+                        document.getElementById('lib_lastname').value = '';
+                        document.getElementById('lib_firstname').value = '';
+                        document.getElementById('lib_middleinitial').value = '';
+                        document.getElementById('lib_password').value = '';
+                        document.getElementById('lib_contactnum').value = '';
+                        document.getElementById('lib_role').value = '';
+                        document.getElementById('lib_email').value = '';
+                        document.getElementById('lib_img').value = '';
+                    })
+                    .catch(error => alert('Error adding librarian: ' + error.message));
+            } else {
+                alert('Please fill out all fields.');
+            }
+        });
 
         // Update Dashboard Chart
         function updateDashboardChart() {
@@ -348,280 +366,386 @@ window.addEventListener('load', populateSchoolDropdown);
         let currentEditingUserId = null;
 
         // Display Schools
-function displaySchools() {
-    const searchQuery = document.getElementById('searchSchoolInput').value.toLowerCase();
-    const schoolsList = document.getElementById('schoolsList');
-    schoolsList.innerHTML = '';
+        function displaySchools() {
+            const searchQuery = document.getElementById('searchSchoolInput').value.toLowerCase();
+            const schoolsList = document.getElementById('schoolsList');
+            schoolsList.innerHTML = '';
 
-    get(child(ref(database), 'schools')).then(snapshot => {
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const school = childSnapshot.val();
-                const schoolId = childSnapshot.key;
-                if (school.name.toLowerCase().includes(searchQuery) ||
-                    school.location.toLowerCase().includes(searchQuery) ||
-                    school.contactNum.includes(searchQuery)) {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'school-item';
-                    listItem.dataset.id = schoolId;
-                    listItem.innerHTML = `
-                        <img src="${school.imageUrl}" alt="School Image">
-                        <div class="details">${school.name}<br>${school.location}<br>${school.contactNum}</div>`;
-                    
-                    // Add click event listener for navigation
-                    listItem.addEventListener('click', () => {
-                        window.location.href = `schoolDetails.html?id=${schoolId}`;
+            get(child(ref(database), 'schools')).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const school = childSnapshot.val();
+                        const schoolId = childSnapshot.key;
+                        if (school.name.toLowerCase().includes(searchQuery) ||
+                            school.location.toLowerCase().includes(searchQuery) ||
+                            school.contactNum.includes(searchQuery)) {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'school-item';
+                            listItem.dataset.id = schoolId;
+                            listItem.innerHTML = `
+                                <img src="${school.imageUrl}" alt="School Image">
+                                <div class="details">${school.name}<br>${school.location}<br>${school.contactNum}</div>`;
+                            
+                            // Add click event listener for navigation
+                            listItem.addEventListener('click', () => {
+                                window.location.href = `schoolDetails.html?id=${schoolId}`;
+                            });
+
+                            schoolsList.appendChild(listItem);
+                        }
                     });
-
-                    schoolsList.appendChild(listItem);
+                } else {
+                    schoolsList.innerHTML = '<li>No schools registered</li>';
                 }
-            });
-        } else {
-            schoolsList.innerHTML = '<li>No schools registered</li>';
+            }).catch(error => alert('Failed to retrieve schools: ' + error.message));
         }
-    }).catch(error => alert('Failed to retrieve schools: ' + error.message));
-}
 
-     // Display Librarians
-function displayLibrarians() {
-    const searchQuery = document.getElementById('searchLibrarianInput').value.toLowerCase();
-    const librariansList = document.getElementById('librariansList');
-    librariansList.innerHTML = '';
+        // Populate School Dropdown for Filtering
+        function populateLibrarianSchoolFilter() {
+            const schoolFilterDropdown = document.getElementById('librarianSchoolFilter');
 
-    get(child(ref(database), 'librarians')).then(snapshot => {
-        if (snapshot.exists()) {
-            const addedLibrarianIds = new Set(); // Create a set to track added librarians
-            snapshot.forEach(childSnapshot => {
-                const librarian = childSnapshot.val();
-                const librarianId = childSnapshot.key;
+            // Reset dropdown options
+            schoolFilterDropdown.innerHTML = '<option value="">All Schools</option>';
 
-                if (librarian.firstName.toLowerCase().includes(searchQuery) ||
-                    librarian.lastName.toLowerCase().includes(searchQuery) ||
-                    librarian.schoolId.toLowerCase().includes(searchQuery) ||
-                    librarian.role.toLowerCase().includes(searchQuery)) {
+            // Fetch schools from Firebase
+            get(child(ref(database), 'schools'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const schools = snapshot.val();
+                        console.log('Schools data fetched:', schools); // Debug log
 
-                    if (!addedLibrarianIds.has(librarianId)) { // Only add if not already added
-                        const listItem = document.createElement('li');
-                        listItem.className = 'librarian-item';
-                        listItem.dataset.id = librarianId;
-                        listItem.innerHTML = `
-                            <img src="${librarian.imageUrl}" alt="Librarian Image">
-                            <div class="details">${librarian.schoolId}<br>${librarian.firstName} ${librarian.middleInitial ? librarian.middleInitial + '.' : ''} ${librarian.lastName}<br>${librarian.contactNum}<br>${librarian.role}</div>`;
-                        
-                        // Add click event listener for navigation
-                        listItem.addEventListener('click', () => {
-                            window.location.href = `librarianDetails.html?id=${librarianId}`;
+                        // Populate dropdown with school names
+                        Object.keys(schools).forEach(schoolId => {
+                            const school = schools[schoolId];
+                            const option = document.createElement('option');
+                            option.value = school.name; // Use school name as the value
+                            option.textContent = school.name; // Display school name
+                            schoolFilterDropdown.appendChild(option);
                         });
-
-                        librariansList.appendChild(listItem);
-                        addedLibrarianIds.add(librarianId); // Mark as added
+                    } else {
+                        console.warn('No schools found in the database.');
                     }
-                }
-            });
-            if (addedLibrarianIds.size === 0) {
-                librariansList.innerHTML = '<li>No librarians registered</li>';
-            }
-        } else {
-            librariansList.innerHTML = '<li>No librarians registered</li>';
-        }
-    }).catch(error => alert('Failed to retrieve librarians: ' + error.message));
-}
-
-function editPopulateSchoolDropdown() {
-    const schoolSelect = document.getElementById('edit_lib_school_select');
-
-    // Clear existing options
-    schoolSelect.innerHTML = '<option value="" disabled selected>Select School</option>';
-
-    // Fetch schools from Firebase
-    get(child(ref(database), 'schools'))
-        .then(snapshot => {
-            if (snapshot.exists()) {
-                snapshot.forEach(childSnapshot => {
-                    const school = childSnapshot.val();
-                    const option = document.createElement('option');
-                    option.value = school.name; // Use school name as value
-                    option.textContent = school.name; // Display school name
-                    schoolSelect.appendChild(option);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch schools:', error.message);
                 });
-                console.log("Schools dropdown populated successfully.");
-            } else {
-                alert('No schools available to select.');
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching schools:", error);
-            alert('Failed to fetch schools: ' + error.message);
-        });
-}
-
-// Call this function on page load
-window.addEventListener('load', editPopulateSchoolDropdown);
-
-// Load librarian data for editing
-function loadEditingLibrarianData() {
-    const librarianData = JSON.parse(sessionStorage.getItem("editingLibrarianData"));
-    if (librarianData) {
-        currentEditingLibrarianId = librarianData.id;
-        document.getElementById('edit_lib_id').value = librarianData.id;
-        document.getElementById('edit_lib_schoolid').value = librarianData.schoolId; // Set School ID
-        document.getElementById('edit_lib_lastname').value = librarianData.lastName;
-        document.getElementById('edit_lib_firstname').value = librarianData.firstName;
-        document.getElementById('edit_lib_middleinitial').value = librarianData.middleInitial || "";
-        document.getElementById('edit_lib_password').value = librarianData.password;
-        document.getElementById('edit_lib_contactnum').value = librarianData.contactNum;
-        document.getElementById('edit_lib_role').value = librarianData.role;
-        document.getElementById('edit_lib_email').value = librarianData.email;
-        document.getElementById('edit_lib_status').value = librarianData.accountStatus || "";
-
-        // Pre-select school in the dropdown if available
-        const schoolSelect = document.getElementById('edit_lib_school_select');
-        if (librarianData.schoolName) {
-            Array.from(schoolSelect.options).forEach(option => {
-                if (option.value === librarianData.schoolName) {
-                    option.selected = true;
-                }
-            });
         }
-    } else {
-        alert("Error: No data found for editing.");
-    }
-}
 
-// Trigger loading data when navigating to the Edit Librarian section
-window.addEventListener("load", () => {
-    if (location.hash === "#editLibrarian") {
-        loadEditingLibrarianData();
-    }
-});
+        // Call this function on page load
+        window.addEventListener('load', () => {
+            populateLibrarianSchoolFilter();
+            displayLibrarians();
+        });
 
 
-        // Display Users
-        function displayUsers() {
-    const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
-    const usersList = document.getElementById('usersList');
-    usersList.innerHTML = '';
+        // Display Librarians
+        // Filter and Display Librarians
+        function displayLibrarians() {
+            const searchQuery = document.getElementById('searchLibrarianInput').value.toLowerCase();
+            const selectedSchool = document.getElementById('librarianSchoolFilter').value;
+            const selectedRole = document.getElementById('librarianRoleFilter').value;
+            const librariansList = document.getElementById('librariansList');
+            librariansList.innerHTML = '';
 
-    get(child(ref(database), 'users')).then(snapshot => {
-        if (snapshot.exists()) {
-            const addedUserIds = new Set(); // Create a set to track added users
-            snapshot.forEach(childSnapshot => {
-                const user = childSnapshot.val();
-                const userId = childSnapshot.key;
+            // Fetch librarians from Firebase
+            get(child(ref(database), 'librarians'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const addedLibrarianIds = new Set(); // Track displayed librarians
+                        snapshot.forEach(childSnapshot => {
+                            const librarian = childSnapshot.val();
+                            const librarianId = childSnapshot.key;
 
-                const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-                const contactNumber = user.contactNumber || 'No Contact Number';
-                const profileImageUrl = user.profileImageUrl || 'default-user.png';
+                            // Check filters
+                            const matchesSearch =
+                                `${librarian.firstName || ''} ${librarian.lastName || ''}`.toLowerCase().includes(searchQuery);
+                            const matchesSchool = !selectedSchool || librarian.schoolName === selectedSchool;
+                            const matchesRole = !selectedRole || librarian.role === selectedRole;
 
-                if (fullName.toLowerCase().includes(searchQuery) || contactNumber.toLowerCase().includes(searchQuery)) {
+                            if (matchesSearch && matchesSchool && matchesRole) {
+                                if (!addedLibrarianIds.has(librarianId)) {
+                                    const listItem = document.createElement('li');
+                                    listItem.className = 'librarian-item';
+                                    listItem.dataset.id = librarianId;
+                                    listItem.innerHTML = `
+                                        <img src="${librarian.imageUrl || 'default-placeholder.png'}" alt="Librarian Image">
+                                        <div class="details">
+                                            <strong>${librarian.schoolName || 'No School Assigned'}</strong><br>
+                                            ${librarian.firstName || ''} ${librarian.middleInitial || ''} ${librarian.lastName || ''}<br>
+                                            ${librarian.role || 'No Role Assigned'}
+                                        </div>
+                                    `;
+                                    librariansList.appendChild(listItem);
 
-                    if (!addedUserIds.has(userId)) { // Only add if not already added
-                        const listItem = document.createElement('li');
-                        listItem.className = 'user-item';
-                        listItem.dataset.id = userId;
-                        listItem.innerHTML = `
-                            <img src="${profileImageUrl}" alt="User Image" class="librarian-img">
-                            <div class="details">
-                                ${fullName || 'No Name'}<br>
-                                ${contactNumber}
-                            </div>
-                            <div class="settings">
-                                <button class="settings-button">&#x22EE;</button>
-                                <div class="settings-menu">
-                                    <button class="edit">Edit</button>
-                                    <button class="delete">Disable</button>
-                                </div>
-                            </div>`;
-                        usersList.appendChild(listItem);
+                                    // Add navigation to details page
+                                    listItem.addEventListener('click', () => {
+                                        window.location.href = `librarianDetails.html?id=${librarianId}`;
+                                    });
 
-                        // Add event listeners for edit and delete buttons
-                        listItem.querySelector('.edit').addEventListener('click', () => {
-                            currentEditingUserId = userId;
-                            navigateToSection('editUser');
+                                    addedLibrarianIds.add(librarianId);
+                                }
+                            }
                         });
 
-                        listItem.querySelector('.delete').addEventListener('click', () => {
-                            disableAccount('users', userId);
-                        });
-
-                        addedUserIds.add(userId); // Mark as added
+                        if (addedLibrarianIds.size === 0) {
+                            librariansList.innerHTML = '<li>No librarians found.</li>';
+                        }
+                    } else {
+                        librariansList.innerHTML = '<li>No librarians registered.</li>';
                     }
-                }
-            });
-            if (addedUserIds.size === 0) {
-                usersList.innerHTML = '<li>No users registered</li>';
-            }
-        } else {
-            usersList.innerHTML = '<li>No users registered</li>';
+                })
+                .catch(error => console.error('Failed to fetch librarians:', error.message));
         }
-    }).catch(error => alert('Failed to retrieve users: ' + error.message));
-}
 
-/// Update librarian data
-document.getElementById("updateLibrarian").addEventListener("click", () => {
-    if (!currentEditingLibrarianId) {
-        alert("Error: No librarian selected for editing.");
-        return;
-    }
 
-    // Gather updated data
-    const updatedData = {
-        schoolId: document.getElementById("edit_lib_schoolid").value.trim(), // Updated School ID
-        schoolName: document.getElementById("edit_lib_school_select").value, // Selected School Name
-        lastName: document.getElementById("edit_lib_lastname").value.trim(),
-        firstName: document.getElementById("edit_lib_firstname").value.trim(),
-        middleInitial: document.getElementById("edit_lib_middleinitial").value.trim(),
-        password: document.getElementById("edit_lib_password").value.trim(),
-        contactNum: document.getElementById("edit_lib_contactnum").value.trim(),
-        role: document.getElementById("edit_lib_role").value.trim(),
-        email: document.getElementById("edit_lib_email").value.trim(),
-    };
+        function editPopulateSchoolDropdown() {
+            const schoolSelect = document.getElementById('edit_lib_school_select');
 
-    // Add status if selected
-    const accountStatus = document.getElementById("edit_lib_status").value;
-    if (accountStatus) {
-        updatedData.accountStatus = accountStatus;
-    }
+            // Clear existing options
+            schoolSelect.innerHTML = '<option value="" disabled selected>Select School</option>';
 
-    // Check for updated image
-    const librarianImg = document.getElementById("edit_lib_img").files[0];
-    if (librarianImg) {
-        const storageReference = storageRef(storage, `librarian_images/${currentEditingLibrarianId}`);
-        uploadBytes(storageReference, librarianImg)
-            .then(snapshot => getDownloadURL(snapshot.ref))
-            .then(imageUrl => {
-                updatedData.imageUrl = imageUrl; // Update the image URL
-                return updateLibrarianInDatabase(updatedData);
-            })
-            .catch(error => alert("Failed to upload image: " + error.message));
-    } else {
-        updateLibrarianInDatabase(updatedData);
-    }
-});
+            // Fetch schools from Firebase
+            get(child(ref(database), 'schools'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const school = childSnapshot.val();
+                            const option = document.createElement('option');
+                            option.value = school.name; // Use school name as value
+                            option.textContent = school.name; // Display school name
+                            schoolSelect.appendChild(option);
+                        });
+                        console.log("Schools dropdown populated successfully.");
+                    } else {
+                        alert('No schools available to select.');
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching schools:", error);
+                    alert('Failed to fetch schools: ' + error.message);
+                });
+        }
 
-// Function to update librarian data in Firebase
-function updateLibrarianInDatabase(data) {
-    update(ref(database, `librarians/${currentEditingLibrarianId}`), data)
-        .then(() => {
-            alert("Librarian details updated successfully!");
-            sessionStorage.removeItem("editingLibrarianData");
-            navigateToSection("displayLibrarians"); // Redirect to the librarians section
-        })
-        .catch(error => {
-            console.error("Error updating librarian:", error);
-            alert("Failed to update librarian: " + error.message);
+        // Call this function on page load
+        window.addEventListener('load', editPopulateSchoolDropdown);
+
+        // Load librarian data for editing
+        function loadEditingLibrarianData() {
+            const librarianData = JSON.parse(sessionStorage.getItem("editingLibrarianData"));
+            if (librarianData) {
+                currentEditingLibrarianId = librarianData.id;
+                document.getElementById('edit_lib_id').value = librarianData.id;
+                document.getElementById('edit_lib_schoolid').value = librarianData.schoolId; // Set School ID
+                document.getElementById('edit_lib_lastname').value = librarianData.lastName;
+                document.getElementById('edit_lib_firstname').value = librarianData.firstName;
+                document.getElementById('edit_lib_middleinitial').value = librarianData.middleInitial || "";
+                document.getElementById('edit_lib_password').value = librarianData.password;
+                document.getElementById('edit_lib_contactnum').value = librarianData.contactNum;
+                document.getElementById('edit_lib_role').value = librarianData.role;
+                document.getElementById('edit_lib_email').value = librarianData.email;
+                document.getElementById('edit_lib_status').value = librarianData.accountStatus || "";
+
+                // Pre-select school in the dropdown if available
+                const schoolSelect = document.getElementById('edit_lib_school_select');
+                if (librarianData.schoolName) {
+                    Array.from(schoolSelect.options).forEach(option => {
+                        if (option.value === librarianData.schoolName) {
+                            option.selected = true;
+                        }
+                    });
+                }
+            } else {
+                alert("Error: No data found for editing.");
+            }
+        }
+
+        // Trigger loading data when navigating to the Edit Librarian section
+        window.addEventListener("load", () => {
+            if (location.hash === "#editLibrarian") {
+                loadEditingLibrarianData();
+            }
         });
-}
 
-// Call dropdown population and data loading on page load
-window.addEventListener("load", () => {
-    if (location.hash === "#editLibrarian") {
-        editPopulateSchoolDropdown();
-        loadEditingLibrarianData();
-    }
-});
+        // Populate Dropdown Filters for Users
+        function populateUserFilters() {
+            const courseFilter = document.getElementById('userCourseFilter');
+            const yearFilter = document.getElementById('userYearFilter');
+            const schoolFilter = document.getElementById('userSchoolFilter');
+
+            // Reset dropdowns
+            courseFilter.innerHTML = '<option value="">All Courses</option>';
+            yearFilter.innerHTML = '<option value="">All Years</option>';
+            schoolFilter.innerHTML = '<option value="">All Schools</option>';
+
+            // Fetch users from Firebase to extract filter options
+            get(child(ref(database), 'users'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const courses = new Set();
+                        const years = new Set();
+                        const schools = new Set();
+
+                        snapshot.forEach(childSnapshot => {
+                            const user = childSnapshot.val();
+                            if (user.course) courses.add(user.course);
+                            if (user.year) years.add(user.year);
+                            if (user.schoolname) schools.add(user.schoolname);
+                        });
+
+                        // Populate dropdown filters
+                        courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course;
+                            option.textContent = course;
+                            courseFilter.appendChild(option);
+                        });
+
+                        years.forEach(year => {
+                            const option = document.createElement('option');
+                            option.value = year;
+                            option.textContent = year;
+                            yearFilter.appendChild(option);
+                        });
+
+                        schools.forEach(school => {
+                            const option = document.createElement('option');
+                            option.value = school;
+                            option.textContent = school;
+                            schoolFilter.appendChild(option);
+                        });
+                    } else {
+                        console.warn('No users found in the database.');
+                    }
+                })
+                .catch(error => console.error('Failed to fetch user filters:', error.message));
+        }
 
 
+        window.addEventListener('load', () => {
+            populateUserFilters(); // Populates course and year filters
+            displayUsers(); // Display users with default filters
+        });
+
+
+        function displayUsers() {
+            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
+            const selectedCourse = document.getElementById('userCourseFilter').value;
+            const selectedYear = document.getElementById('userYearFilter').value;
+            const selectedSchool = document.getElementById('userSchoolFilter').value;
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = ''; // Clear the list before displaying
+
+            // Fetch users from Firebase
+            get(child(ref(database), 'users'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        let found = false;
+
+                        snapshot.forEach(childSnapshot => {
+                            const user = childSnapshot.val();
+                            const userId = childSnapshot.key;
+
+                            // Check if the user matches the filters
+                            const matchesSearch = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase().includes(searchQuery);
+                            const matchesCourse = !selectedCourse || user.course === selectedCourse;
+                            const matchesYear = !selectedYear || user.year === selectedYear;
+                            const matchesSchool = !selectedSchool || user.schoolname === selectedSchool; // Ensure this matches `schooll`
+
+                            if (matchesSearch && matchesCourse && matchesYear && matchesSchool) {
+                                found = true;
+
+                                // Create a user list item
+                                const listItem = document.createElement('li');
+                                listItem.className = 'user-item';
+                                listItem.dataset.id = userId;
+                                listItem.innerHTML = `
+                                    <img src="${user.profileImageUrl || 'default-user.png'}" alt="User Image" class="user-img">
+                                    <div class="details">
+                                        <strong>${user.firstName || ''} ${user.lastName || ''}</strong><br>
+                                        Course: ${user.course || 'N/A'}<br>
+                                        Year: ${user.year || 'N/A'}<br>
+                                        School: ${user.schoolname || 'N/A'} <!-- Display the correct school -->
+                                    </div>
+                                `;
+                                usersList.appendChild(listItem);
+                            }
+                        });
+
+                        if (!found) {
+                            usersList.innerHTML = '<li>No users match the selected filters.</li>';
+                        }
+                    } else {
+                        usersList.innerHTML = '<li>No users registered.</li>';
+                    }
+                })
+                .catch(error => console.error('Failed to fetch users:', error.message));
+        }
+
+
+        /// Update librarian data
+        document.getElementById("updateLibrarian").addEventListener("click", () => {
+            if (!currentEditingLibrarianId) {
+                alert("Error: No librarian selected for editing.");
+                return;
+            }
+
+            // Gather updated data
+            const updatedData = {
+                schoolId: document.getElementById("edit_lib_schoolid").value.trim(), // Updated School ID
+                schoolName: document.getElementById("edit_lib_school_select").value, // Selected School Name
+                lastName: document.getElementById("edit_lib_lastname").value.trim(),
+                firstName: document.getElementById("edit_lib_firstname").value.trim(),
+                middleInitial: document.getElementById("edit_lib_middleinitial").value.trim(),
+                password: document.getElementById("edit_lib_password").value.trim(),
+                contactNum: document.getElementById("edit_lib_contactnum").value.trim(),
+                role: document.getElementById("edit_lib_role").value.trim(),
+                email: document.getElementById("edit_lib_email").value.trim(),
+            };
+
+            // Add status if selected
+            const accountStatus = document.getElementById("edit_lib_status").value;
+            if (accountStatus) {
+                updatedData.accountStatus = accountStatus;
+            }
+
+            // Check for updated image
+            const librarianImg = document.getElementById("edit_lib_img").files[0];
+            if (librarianImg) {
+                const storageReference = storageRef(storage, `librarian_images/${currentEditingLibrarianId}`);
+                uploadBytes(storageReference, librarianImg)
+                    .then(snapshot => getDownloadURL(snapshot.ref))
+                    .then(imageUrl => {
+                        updatedData.imageUrl = imageUrl; // Update the image URL
+                        return updateLibrarianInDatabase(updatedData);
+                    })
+                    .catch(error => alert("Failed to upload image: " + error.message));
+            } else {
+                updateLibrarianInDatabase(updatedData);
+            }
+        });
+
+        // Function to update librarian data in Firebase
+        function updateLibrarianInDatabase(data) {
+            update(ref(database, `librarians/${currentEditingLibrarianId}`), data)
+                .then(() => {
+                    alert("Librarian details updated successfully!");
+                    sessionStorage.removeItem("editingLibrarianData");
+                    navigateToSection("displayLibrarians"); // Redirect to the librarians section
+                })
+                .catch(error => {
+                    console.error("Error updating librarian:", error);
+                    alert("Failed to update librarian: " + error.message);
+                });
+        }
+
+        // Call dropdown population and data loading on page load
+        window.addEventListener("load", () => {
+            if (location.hash === "#editLibrarian") {
+                editPopulateSchoolDropdown();
+                loadEditingLibrarianData();
+            }
+        });
+        
         // Disable Account
         function disableAccount(type, id) {
             const updates = {};
@@ -660,6 +784,14 @@ window.addEventListener("load", () => {
                 else if (targetId === 'displayUsers') displayUsers();
             });
         });
+
+        document.getElementById('librarianSchoolFilter').addEventListener('change', displayLibrarians);
+        document.getElementById('librarianRoleFilter').addEventListener('change', displayLibrarians);
+        document.getElementById('userCourseFilter').addEventListener('change', displayUsers);
+        document.getElementById('userYearFilter').addEventListener('change', displayUsers);
+        document.getElementById('userSchoolFilter').addEventListener('change', displayUsers);
+        document.getElementById('searchUserInput').addEventListener('input', displayUsers);
+
 
         // Load Data on Page Load
         window.addEventListener('load', () => {
