@@ -3,21 +3,21 @@
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #a67c52; /* Warm brown border */
+    border: 1px solid #82A0BC; /* Blue-gray border */
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 16px;
     transition: border-color 0.3s ease;
-    background-color: #f5f1e3; /* Light parchment background */
+    background-color: #fff; /* Light sky-blue background */
 }
 
 .modern-input:focus {
-    border-color: #6b4226; /* Darker brown on focus */
+    border-color: #304D6D; /* Darker blue-gray on focus */
     outline: none;
 }
 
 .modern-button {
-    background-color: #6b4226; /* Dark brown */
+    background-color: #304D6D; /* Dark blue-gray */
     color: white;
     padding: 12px 20px;
     border: none;
@@ -28,14 +28,14 @@
 }
 
 .modern-button:hover {
-    background-color: #4e2f1e; /* Even darker brown on hover */
+    background-color: #545E75; /* Dark slate-blue on hover */
 }
 
 /* Add School and Librarian Section Styling */
 #addSchool, #addLibrarian {
-    background: #f5f1e3; /* Light parchment background */
+    background: #a7cced; /* Light sky-blue background */
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(1, 1, 1, 1);
     padding: 20px;
     margin: 20px auto;
     max-width: 600px;
@@ -43,10 +43,15 @@
 
 #addSchool h2, #addLibrarian h2 {
     margin-bottom: 20px;
-    color: #4e2f1e; /* Dark brown */
+    color: #304D6D; /* Dark blue-gray */
     font-size: 24px;
     font-weight: 600;
 }
+
+::placeholder {
+    color: #000000;
+    opacity: 1; /* Firefox */
+  }
 
 /* Existing Styles */
 body {
@@ -56,12 +61,12 @@ body {
     height: 100vh;
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(to bottom, #ece2d0, #bfa48d); /* Warm gradient background */
+    background: linear-gradient(to bottom, #A7CCED, #82A0BC); /* Gradient with light sky-blue and blue-gray */
 }
 
 /* Login Box Styling */
 #login-box {
-    background: #f5f1e3; /* Light parchment */
+    background: #A7CCED; /* Light sky-blue */
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 300px;
@@ -73,8 +78,9 @@ body {
 
 .left h1 {
     margin: 0 0 20px 0;
-    color: #4e2f1e; /* Dark brown */
+    color: #304D6D; /* Dark blue-gray */
 }
+
 .wrapper {
     display: flex;
     width: 100%;
@@ -83,7 +89,7 @@ body {
 
 #navbar {
     width: 220px;
-    background-color: #4e2f1e;
+    background-color: #304D6D; /* Dark blue-gray */
     color: white;
     padding: 20px;
     position: fixed;
@@ -103,7 +109,7 @@ body {
 }
 
 #navbar ul li a {
-    color: #f5f1e3;
+    color: #304D6D; /* Light sky-blue */
     text-decoration: none;
     font-size: 20px; /* Larger font size */
     display: block;
@@ -113,11 +119,11 @@ body {
 }
 
 #navbar ul li a:hover {
-    background-color: #6b4226;
+    background-color: #545E75; /* Dark slate-blue */
 }
 
 #navbar ul li a {
-    color: #ecf0f1;
+    color: #304D6D; /* Light sky-blue */
     text-decoration: none;
     font-size: 18px;
     display: block;
@@ -127,7 +133,7 @@ body {
 }
 
 #navbar ul li a:hover {
-    background-color: #34495e;
+    background-color: #63ADF2; /* Medium blue */
     color: #ffffff;
 }
 
@@ -135,37 +141,37 @@ body {
     flex: 1;
     padding: 30px; /* Increase padding */
     margin-left: 280px; /* Adjust margin to accommodate larger navbar */
-    background-color: #ece2d0;
+    background-color: #A7CCED;
     overflow-y: auto;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1); /* Larger shadow */
 }
 
 .school-item, .librarian-item, .user-item, .book-item {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 calc(33.333% - 30px); /* Adjust for responsiveness */
-    margin-bottom: 30px;
-    padding: 25px; /* Larger padding */
-    background-color: #f5f1e3;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15); /* Larger shadow */
+    flex: 1 1 calc(33.333% - 20px); /* Adjust card width for 3 columns */
+    box-sizing: border-box;         /* Prevent padding from breaking layout */
+    margin-bottom: 20px;            /* Space between rows */
+    background-color: #a7cced;      /* Keep the light blue background */
+    padding: 20px;                  /* Padding inside each card */
+    border-radius: 8px;             /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     transition: transform 0.3s;
 }
 
+
 .school-item:hover, .librarian-item:hover, .user-item:hover, .book-item:hover {
-    transform: scale(1.05); /* Increase scale effect */
+    transform: scale(1.02); /* Slight hover effect */
 }
 
 .school-item img, .librarian-item img, .user-item img, .book-item img {
-    width: 100%;
-    height: 300px; /* Increase height */
-    object-fit: contain;
-    border-radius: 10px 10px 0 0;
+    width: 100%;           /* Ensure images take full width */
+    height: 250px;         /* Fixed height for images */
+    object-fit: contain;   /* Prevent image distortion */
+    border-radius: 8px 8px 0 0;
 }
 
 .details {
     font-size: 18px; /* Larger font size */
-    color: #4e2f1e;
+    color: #304D6D; /* Dark blue-gray */
     padding: 20px 0; /* Increase padding */
     text-align: center;
 }
@@ -180,33 +186,33 @@ body {
 
 h2 {
     margin: 0 0 20px;
-    color: #2c3e50;
+    color: #304D6D; /* Dark blue-gray */
     font-size: 24px;
     font-weight: 600;
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid #63ADF2; /* Medium blue */
     padding-bottom: 10px;
 }
 
-#displaySchools, #displayLibrarians {
-    display: flex;
-    flex-wrap: wrap; /* Allows items to wrap to the next line if needed */
-    gap: 20px; /* Space between items */
-    justify-content: flex-start; /* Align items to the start of the container */
+#displaySchools, #displayLibrarians, .card-container {
+    display: flex;           /* Use flexbox for layout */
+    flex-wrap: wrap;         /* Allow cards to wrap to the next row */
+    gap: 20px;               /* Space between cards */
+    justify-content: space-between; /* Spread cards evenly */
+    margin: 0 auto;          /* Center-align the grid */
 }
 
 /* Item styles for side-by-side layout */
 .school-item, .librarian-item {
     display: flex;
     flex-direction: column;
-    flex: 1 1 calc(33.333% - 20px); /* Adjust this percentage for the number of items per row */
+    flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #C4A484;
+    background-color: #a7cced; /* Medium blue */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
 }
-
 
 .school-item:hover, .librarian-item:hover {
     transform: scale(1.02);
@@ -221,7 +227,7 @@ h2 {
 
 .school-item .details, .librarian-item .details {
     font-size: 16px;
-    color: #34495e;
+    color: #304D6D; /* Dark blue-gray */
     padding: 15px 0;
     text-align: center;
     line-height: 1.6;
@@ -231,14 +237,14 @@ h2 {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid #545E75; /* Dark slate-blue border */
     border-radius: 4px;
     font-size: 16px;
     box-sizing: border-box;
 }
 
 .modern-search-input:focus {
-    border-color: #007bff;
+    border-color: #63ADF2; /* Medium blue */
     outline: none;
 }
 
@@ -253,7 +259,7 @@ h2 {
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: #555;
+    color: #545E75; /* Dark slate-blue */
 }
 
 .settings-menu {
@@ -261,7 +267,7 @@ h2 {
     position: absolute;
     top: 30px;
     right: 0;
-    background-color: #ffffff;
+    background-color: #A7CCED; /* Light sky-blue */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     z-index: 1000;
@@ -275,12 +281,13 @@ h2 {
     border: none;
     cursor: pointer;
     text-align: left;
-    color: #333;
+    color: #304D6D; /* Dark blue-gray */
     font-size: 14px;
 }
 
 .settings-menu button:hover {
-    background-color: #f0f0f0;
+    background-color: #63ADF2; /* Medium blue */
+    color: #ffffff;
 }
 
 /* Show settings menu on button click */
@@ -289,28 +296,25 @@ h2 {
     display: block;
 }
 
-/* Modernize list styling */
-ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-li {
-    margin: 10px 0;
-    border: 1px solid #ddd;
-}
-
-/* Ensure items are responsive and aligned */
+/* Responsive Layouts */
 @media (max-width: 768px) {
-    .school-item, .librarian-item {
-        flex: 1 1 calc(50% - 20px);
-    }
+    .school-item, .librarian-item, .user-item, .book-item {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 calc(33.333% - 20px); /* 3 cards per row with space */
+    box-sizing: border-box;         /* Include padding and borders in size */
+    margin-bottom: 20px;            /* Space between rows */
+    background-color: #a7cced;      /* Light blue background */
+    padding: 20px;                  /* Padding inside each card */
+    border-radius: 8px;             /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: transform 0.3s;
+}
 }
 
 @media (max-width: 480px) {
-    .school-item, .librarian-item {
-        flex: 1 1 100%;
+    .school-item, .librarian-item, .user-item, .book-item {
+        flex: 1 1 100%; /* 1 card per row */
     }
 }
 
@@ -321,7 +325,7 @@ li {
     flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #C4A484;
+    background-color: #A7CCED; /* Medium blue */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -340,7 +344,7 @@ li {
 
 .user-item .details {
     font-size: 16px;
-    color: #34495e;
+    color: #304D6D; /* Dark blue-gray */
     padding: 15px 0;
     text-align: center;
     line-height: 1.6;
@@ -352,7 +356,7 @@ li {
     flex: 1 1 calc(33.333% - 20px); /* Adjust for responsiveness */
     margin-bottom: 20px;
     padding: 20px;
-    background-color: #C4A484;
+    background-color: #A7CCED; /* Medium blue */
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
@@ -371,11 +375,12 @@ li {
 
 .book-item .details {
     font-size: 16px;
-    color: #34495e;
+    color: #304D6D; /* Dark blue-gray */
     padding: 15px 0;
     text-align: center;
     line-height: 1.6;
 }
+
 #image{
     width: 100px;
     height: 100px;
@@ -398,4 +403,174 @@ li {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
 }
 
+/* Modernize list styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
 
+li {
+    margin: 10px 0;
+    border: 1px solid #0e0e0e; /* Blue-gray border */
+    background-color: #A7CCED; /* Light sky-blue */
+    border-radius: 5px;
+    padding: 10px;
+    color: #A7CCED; /* Dark blue-gray */
+    transition: background-color 0.3s, color 0.3s;
+    max-width: 400px;
+}
+
+li:hover {
+    background-color: #A7CCED; /* Medium blue on hover */
+    color: white;
+}
+
+/* H2 Tag Border Fix */
+h2 {
+    margin: 0 0 20px;
+    color: #304D6D; /* Dark blue-gray */
+    font-size: 24px;
+    font-weight: 600;
+    border-bottom: 2px solid #545E75; /* Dark slate-blue */
+    padding-bottom: 10px;
+}
+
+/* Modern Input Focus State */
+.modern-input:focus {
+    border-color: #63ADF2; /* Medium blue */
+    outline: none;
+    background-color: #A7CCED; /* Light sky-blue */
+}
+
+/* Modern Button Hover Fix */
+.modern-button:hover {
+    background-color: #63ADF2; /* Medium blue */
+    color: #ffffff; /* Ensure white text on hover */
+}
+
+/* Navbar Links - Hover Consistency */
+#navbar ul li a:hover {
+    background-color: #545E75; /* Dark slate-blue */
+    color: #A7CCED; /* Light sky-blue */
+}
+
+.section {
+    display: none;
+    background-color: #a7cced; /* Light sky-blue for hidden sections */
+    color: #000000; /* Dark blue-gray text */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+#dashboard {
+    display: block;
+    background-color: #a7cced; /* Blue-gray for the active section */
+    color: #000000;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 3px 10px rgba(1, 1, 1, 1);
+}
+
+.school-item img, .librarian-item img, .user-item img, .book-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain; /* Ensure consistent sizing */
+    border-radius: 8px 8px 0 0;
+    background-color: #A7CCED; /* Light sky-blue background for empty images */
+}
+/* Apply a grid layout to the book and user lists */
+#booksList, #usersList {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+    gap: 20px; /* Add space between items */
+    padding: 20px;
+    list-style: none;
+    margin: 0;
+}
+
+/* Style individual items in the list */
+.book-item, .user-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #a7cced;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.book-item img, .user-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.details {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+}
+
+/* Adjust image size */
+.book-item img, .user-item img {
+    max-height: 150px;
+    max-width: 100px;
+}
+
+/* Hover effects for items */
+.book-item:hover, .user-item:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    background: #a0d3ff;
+}
+/* Common grid layout for lists */
+#schoolsList, #librariansList, #usersList {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 items per row */
+    gap: 20px; /* Add space between items */
+    padding: 20px;
+    list-style: none;
+    margin: 0;
+}
+
+/* Common styles for individual items */
+.school-item, .librarian-item, .user-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #a7cced;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Images within the items */
+.school-item img, .librarian-item img, .user-item img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Details section for items */
+.school-item .details, .librarian-item .details, .user-item .details {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+}
+
+/* Hover effect */
+.school-item:hover, .librarian-item:hover, .user-item:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    background: #a0d3ff;
+}

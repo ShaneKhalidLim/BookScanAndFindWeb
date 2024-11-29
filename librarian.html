@@ -22,6 +22,7 @@
                 <li><a href="#" class="nav-link" data-target="addUser">Add User</a></li> <!-- Add User Link -->
                 <li><a href="#" class="nav-link" data-target="displayBooks">Books Registered</a></li>
                 <li><a href="#" class="nav-link" data-target="displayUsers">Users Registered</a></li>
+                <li><a href="#" class="nav-link" data-target="createBarcode">Create Barcode</a></li>
                 <li><a href="#" id="logout">Logout</a></li> <!-- Logout -->
             </ul>
         </div>
@@ -54,6 +55,18 @@
                 <option value="Disabled">Disabled</option>
             </select>
             
+            <div style="text-align: center;">
+                <label for="barcodeData" style="font-size: 1rem;">Enter Barcode Number:</label><br>
+                <input type="text" id="barcodeData" placeholder="Barcode Number" class="modern-input" style="width: 50%; margin-bottom: 10px;">
+                <br>
+                <button id="generateBarcode" class="modern-button">Generate Barcode</button>
+            </div>
+            <div id="barcodeDisplay" style="text-align: center; margin-top: 20px; display: none;">
+                <img id="barcodeImage" alt="Barcode" src="" style="margin-bottom: 10px;"/>
+                <div>
+                    <button id="downloadBarcode" class="modern-button" style="margin-top: 10px;">View Barcode</button>
+                </div>
+            </div>
             <button id="submitBook" class="modern-button">Add Book</button>
         </div> 
             <!-- Edit Book Section -->
@@ -250,9 +263,6 @@
                 </div>
                 <ul id="usersList"></ul>
             </div>
-            
-
-
         </div>
     </div>
 
@@ -362,6 +372,36 @@
                 })
                 .catch(error => alert('Failed to add book: ' + error.message));
         });
+
+        document.getElementById('generateBarcode').addEventListener('click', () => {
+            const barcodeData = document.getElementById('barcodeData').value.trim();
+
+            if (!barcodeData) {
+                alert('Please enter data to generate a barcode.');
+                return;
+            }
+
+            // Generate the barcode image URL
+            const barcodeImage = document.getElementById('barcodeImage');
+            const barcodeUrl = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(barcodeData)}&code=Code128`;
+            barcodeImage.src = barcodeUrl;
+
+            // Show the barcode display
+            document.getElementById('barcodeDisplay').style.display = 'block';
+
+            // Set up the download functionality
+            const downloadButton = document.getElementById('downloadBarcode');
+            downloadButton.addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.href = barcodeUrl; // Use the URL from the generated barcode
+                link.download = `${barcodeData}_barcode.png`;
+                link.click();
+            });
+        });
+
+
+
+
 
         function populateSchoolDropdowns() {
             const schoolSelectAdd = document.getElementById('user_school_select');
@@ -594,12 +634,13 @@
         // Event listeners for filters and search
         document.getElementById('userCourseFilter').addEventListener('change', displayUsers);
         document.getElementById('userYearFilter').addEventListener('change', displayUsers);
-        document.getElementById('searchUserInput').addEventListener('input', displayUsers);
+        // document.getElementById('searchUserInput').addEventListener('input', displayUsers);
 
         // Event listeners for filters and search
         document.getElementById('bookCategoryFilter').addEventListener('change', displayBooks);
         document.getElementById('bookStatusFilter').addEventListener('change', displayBooks);
         document.getElementById('searchBookInput').addEventListener('input', displayBooks);
+        document.getElementById('searchBookInput').removeEventListener('input', displayBooks);
 
         let dashboardChart; // Global variable to hold the chart instance
 
@@ -635,15 +676,50 @@
                         datasets: [{
                             label: 'Counts',
                             data: data,
-                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                            backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)'],
                             borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
                             borderWidth: 1
                         }]
                     },
                     options: {
                         scales: {
+                            x: {
+                                ticks: {
+                                    color: '#000', // Set x-axis tick labels to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
                             y: {
+                                ticks: {
+                                    color: '#000', // Set y-axis tick labels to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                },
                                 beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#000', // Set legend text color to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                bodyColor: '#fff', // Tooltip body text color
+                                titleColor: '#fff', // Tooltip title text color
+                                footerColor: '#fff' // Tooltip footer text color
                             }
                         }
                     }
@@ -751,6 +827,9 @@
 
                 if (targetId === 'displayBooks') displayBooks();
                 else if (targetId === 'displayUsers') displayUsers();
+                else if (targetId === 'createBarcode') {
+                    document.getElementById('barcodeDisplay').style.display = 'none'; // Reset the barcode display
+                }
             });
         });
 

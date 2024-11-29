@@ -336,19 +336,68 @@
                 new Chart(document.getElementById('dashboardChart').getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: ['Schools', 'Librarians', 'Users'],
                         datasets: [{
                             label: 'Counts',
                             data: data,
-                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
-                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
                             borderWidth: 1
                         }]
                     },
                     options: {
                         scales: {
+                            x: {
+                                ticks: {
+                                    color: '#000', // Set x-axis tick labels to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
                             y: {
+                                ticks: {
+                                    color: '#000', // Set y-axis tick labels to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
                                 beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#000', // Set legend text color to black
+                                    font: {
+                                        size: 14,
+                                        family: 'Arial',
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                bodyColor: '#fff', // Tooltip body text color
+                                titleColor: '#fff', // Tooltip title text color
+                                footerColor: '#fff' // Tooltip footer text color
                             }
                         }
                     }
@@ -434,7 +483,7 @@
         // Call this function on page load
         window.addEventListener('load', () => {
             populateLibrarianSchoolFilter();
-            displayLibrarians();
+            // displayLibrarians();
         });
 
 
@@ -445,7 +494,7 @@
             const selectedSchool = document.getElementById('librarianSchoolFilter').value;
             const selectedRole = document.getElementById('librarianRoleFilter').value;
             const librariansList = document.getElementById('librariansList');
-            librariansList.innerHTML = '';
+            librariansList.innerHTML = ''; // Clear the list before populating
 
             // Fetch librarians from Firebase
             get(child(ref(database), 'librarians'))
@@ -462,28 +511,26 @@
                             const matchesSchool = !selectedSchool || librarian.schoolName === selectedSchool;
                             const matchesRole = !selectedRole || librarian.role === selectedRole;
 
-                            if (matchesSearch && matchesSchool && matchesRole) {
-                                if (!addedLibrarianIds.has(librarianId)) {
-                                    const listItem = document.createElement('li');
-                                    listItem.className = 'librarian-item';
-                                    listItem.dataset.id = librarianId;
-                                    listItem.innerHTML = `
-                                        <img src="${librarian.imageUrl || 'default-placeholder.png'}" alt="Librarian Image">
-                                        <div class="details">
-                                            <strong>${librarian.schoolName || 'No School Assigned'}</strong><br>
-                                            ${librarian.firstName || ''} ${librarian.middleInitial || ''} ${librarian.lastName || ''}<br>
-                                            ${librarian.role || 'No Role Assigned'}
-                                        </div>
-                                    `;
-                                    librariansList.appendChild(listItem);
+                            if (matchesSearch && matchesSchool && matchesRole && !addedLibrarianIds.has(librarianId)) {
+                                const listItem = document.createElement('li');
+                                listItem.className = 'librarian-item';
+                                listItem.dataset.id = librarianId;
+                                listItem.innerHTML = `
+                                    <img src="${librarian.imageUrl || 'default-placeholder.png'}" alt="Librarian Image">
+                                    <div class="details">
+                                        <strong>${librarian.schoolName || 'No School Assigned'}</strong><br>
+                                        ${librarian.firstName || ''} ${librarian.middleInitial || ''} ${librarian.lastName || ''}<br>
+                                        ${librarian.role || 'No Role Assigned'}
+                                    </div>
+                                `;
+                                librariansList.appendChild(listItem);
 
-                                    // Add navigation to details page
-                                    listItem.addEventListener('click', () => {
-                                        window.location.href = `librarianDetails.html?id=${librarianId}`;
-                                    });
+                                // Add navigation to details page
+                                listItem.addEventListener('click', () => {
+                                    window.location.href = `librarianDetails.html?id=${librarianId}`;
+                                });
 
-                                    addedLibrarianIds.add(librarianId);
-                                }
+                                addedLibrarianIds.add(librarianId); // Mark this librarian as added
                             }
                         });
 
@@ -496,7 +543,6 @@
                 })
                 .catch(error => console.error('Failed to fetch librarians:', error.message));
         }
-
 
         function editPopulateSchoolDropdown() {
             const schoolSelect = document.getElementById('edit_lib_school_select');
