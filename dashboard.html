@@ -265,6 +265,7 @@
             const libEmail = document.getElementById('lib_email').value.trim();
             const libImg = document.getElementById('lib_img').files[0];
 
+            // Validate that all required fields are filled
             if (
                 libId &&
                 schoolId &&
@@ -277,47 +278,62 @@
                 libEmail &&
                 libImg
             ) {
-                const storageReference = storageRef(storage, 'librarian_images/' + libId);
+                // Reference to the librarian ID location in the database
+                const librarianRef = ref(database, 'librarians/' + libId);
 
-                uploadBytes(storageReference, libImg)
-                    .then(snapshot => getDownloadURL(snapshot.ref))
-                    .then(url => {
-                        const librarianData = {
-                            id: libId,
-                            schoolId: schoolId, // Save the inputted School ID
-                            schoolName: schoolName, // Save the selected School Name
-                            lastName: libLastName,
-                            firstName: libFirstName,
-                            middleInitial: libMiddleInitial,
-                            contactNum: libContactNum,
-                            role: libRole,
-                            email: libEmail,
-                            password: libPassword,
-                            imageUrl: url,
-                        };
+                // Check if the librarian ID already exists
+                get(librarianRef)
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            // If the librarian ID already exists, alert the user
+                            alert('A librarian with this ID already exists. Please use a different ID.');
+                        } else {
+                            // Upload image to Firebase Storage
+                            const storageReference = storageRef(storage, 'librarian_images/' + libId);
+                            uploadBytes(storageReference, libImg)
+                                .then(snapshot => getDownloadURL(snapshot.ref))
+                                .then(url => {
+                                    // Save librarian data to Firebase Realtime Database
+                                    const librarianData = {
+                                        id: libId,
+                                        schoolId: schoolId, // Save the inputted School ID
+                                        schoolName: schoolName, // Save the selected School Name
+                                        lastName: libLastName,
+                                        firstName: libFirstName,
+                                        middleInitial: libMiddleInitial,
+                                        contactNum: libContactNum,
+                                        role: libRole,
+                                        email: libEmail,
+                                        password: libPassword,
+                                        imageUrl: url,
+                                    };
 
-                        return set(ref(database, 'librarians/' + libId), librarianData);
+                                    return set(librarianRef, librarianData);
+                                })
+                                .then(() => {
+                                    alert('Librarian added successfully!');
+                                    // Reset form fields after success
+                                    document.getElementById('lib_id').value = '';
+                                    document.getElementById('lib_school_id').value = '';
+                                    document.getElementById('lib_school_select').value = '';
+                                    document.getElementById('lib_lastname').value = '';
+                                    document.getElementById('lib_firstname').value = '';
+                                    document.getElementById('lib_middleinitial').value = '';
+                                    document.getElementById('lib_password').value = '';
+                                    document.getElementById('lib_contactnum').value = '';
+                                    document.getElementById('lib_role').value = '';
+                                    document.getElementById('lib_email').value = '';
+                                    document.getElementById('lib_img').value = '';
+                                })
+                                .catch(error => alert('Error adding librarian: ' + error.message));
+                        }
                     })
-                    .then(() => {
-                        alert('Librarian added successfully!');
-                        // Reset fields
-                        document.getElementById('lib_id').value = '';
-                        document.getElementById('lib_school_id').value = '';
-                        document.getElementById('lib_school_select').value = '';
-                        document.getElementById('lib_lastname').value = '';
-                        document.getElementById('lib_firstname').value = '';
-                        document.getElementById('lib_middleinitial').value = '';
-                        document.getElementById('lib_password').value = '';
-                        document.getElementById('lib_contactnum').value = '';
-                        document.getElementById('lib_role').value = '';
-                        document.getElementById('lib_email').value = '';
-                        document.getElementById('lib_img').value = '';
-                    })
-                    .catch(error => alert('Error adding librarian: ' + error.message));
+                    .catch(error => alert('Error checking librarian ID: ' + error.message));
             } else {
                 alert('Please fill out all fields.');
             }
         });
+
 
         // Update Dashboard Chart
         function updateDashboardChart() {

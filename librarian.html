@@ -317,62 +317,70 @@
             const bookStatus = document.getElementById('book_status').value.trim();
             const bookImg = document.getElementById('book_img').files[0];
 
-            // Validate all required fields are filled
-            if (
-                !bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
+            // Validate fields
+            if (!bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
                 !bookCallNumber || !bookBarcode || isNaN(bookShelfNumber) || 
-                isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg
-            ) {
+                isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg) {
                 alert('Please fill out all fields and select an image.');
                 return;
             }
 
-            // Validate that a valid status is selected
+            // Validate status selection
             if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
                 alert('Please select a valid status.');
                 return;
             }
 
-            // Reference to the storage and database paths
-            const storageReference = storageRef(storage, 'book_images/' + bookId);
+            // Reference to the book ID location in the database
+            const bookRef = ref(database, 'books/' + bookId);
 
-            // Upload the book image
-            uploadBytes(storageReference, bookImg)
-                .then(snapshot => getDownloadURL(snapshot.ref))
-                .then(url => {
-                    // Set book data in the Firebase database
-                    return set(ref(database, 'books/' + bookId), {
-                        id: bookId,
-                        title: bookTitle,
-                        author: bookAuthor,
-                        description: bookDescription,
-                        category: bookCategory,
-                        callnumber: bookCallNumber,
-                        barcode: bookBarcode,
-                        shelfNumber: bookShelfNumber, // Stored as integer
-                        shelfRow: bookShelfRow,       // Stored as integer
-                        shelfColumn: bookShelfColumn, // Stored as integer
-                        bookStatus: bookStatus,
-                        imageURL: url
-                    });
+            // Check if the book ID already exists
+            get(bookRef)
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        // If the book ID already exists, alert the user
+                        alert('A book with this ID already exists. Please use a different ID.');
+                    } else {
+                        // Upload image to Firebase Storage
+                        const storageReference = storageRef(storage, 'book_images/' + bookId);
+                        uploadBytes(storageReference, bookImg)
+                            .then(snapshot => getDownloadURL(snapshot.ref))
+                            .then(url => {
+                                // Save book data to Firebase Realtime Database
+                                return set(bookRef, {
+                                    id: bookId,
+                                    title: bookTitle,
+                                    author: bookAuthor,
+                                    description: bookDescription,
+                                    category: bookCategory,
+                                    callnumber: bookCallNumber,
+                                    barcode: bookBarcode,
+                                    shelfNumber: bookShelfNumber, 
+                                    shelfRow: bookShelfRow,
+                                    shelfColumn: bookShelfColumn,
+                                    bookStatus: bookStatus,
+                                    imageURL: url
+                                });
+                            })
+                            .then(() => {
+                                alert('Book added successfully.');
+                                document.getElementById('book_id').value = '';
+                                document.getElementById('book_img').value = '';
+                                document.getElementById('book_title').value = '';
+                                document.getElementById('book_author').value = '';
+                                document.getElementById('book_description').value = '';
+                                document.getElementById('book_category').value = '';
+                                document.getElementById('book_callnumber').value = '';
+                                document.getElementById('book_barcode').value = '';
+                                document.getElementById('book_shelfNumber').value = '';
+                                document.getElementById('book_shelfRow').value = '';
+                                document.getElementById('book_shelfColumn').value = '';
+                                document.getElementById('book_status').value = '';
+                            })
+                            .catch(error => alert('Failed to add book: ' + error.message));
+                    }
                 })
-                .then(() => {
-                    alert('Book added successfully.');
-                    // Clear input fields after success
-                    document.getElementById('book_id').value = '';
-                    document.getElementById('book_img').value = '';
-                    document.getElementById('book_title').value = '';
-                    document.getElementById('book_author').value = '';
-                    document.getElementById('book_description').value = '';
-                    document.getElementById('book_category').value = '';
-                    document.getElementById('book_callnumber').value = '';
-                    document.getElementById('book_barcode').value = '';
-                    document.getElementById('book_shelfNumber').value = '';
-                    document.getElementById('book_shelfRow').value = '';
-                    document.getElementById('book_shelfColumn').value = '';
-                    document.getElementById('book_status').value = '';
-                })
-                .catch(error => alert('Failed to add book: ' + error.message));
+                .catch(error => alert('Error checking book ID: ' + error.message));
         });
 
 
@@ -401,11 +409,6 @@
                 link.click();
             });
         });
-
-
-
-
-
         function populateSchoolDropdowns() {
             const schoolSelectAdd = document.getElementById('user_school_select');
             const schoolSelectEdit = document.getElementById('edit_user_school_select');
@@ -447,7 +450,69 @@
 
         // Call this function on page load
         window.addEventListener('load', populateSchoolDropdowns);
+        
+        document.getElementById('submitUser').addEventListener('click', () => {
+            const userId = document.getElementById('user_id').value.trim();
+            const userSchoolId = document.getElementById('user_schoolid').value.trim();
+            const userLastName = document.getElementById('user_lastname').value.trim();
+            const userFirstName = document.getElementById('user_firstname').value.trim();
+            const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
+            const userPassword = document.getElementById('user_password').value;
+            const userContactNumber = document.getElementById('user_contactnumber').value.trim();
+            const userCourse = document.getElementById('user_course').value.trim();
+            const userYear = document.getElementById('user_year').value;
+            const userImg = document.getElementById('user_img').files[0];
 
+            // Validate user fields
+            if (userId && userSchoolId && userLastName && userFirstName && userPassword && userContactNumber && userCourse && userYear && userImg) {
+                const userRef = ref(database, 'users/' + userId);
+
+                // Check if the user ID already exists
+                get(userRef)
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            // If the user ID already exists, alert the user
+                            alert('A user with this ID already exists. Please use a different ID.');
+                        } else {
+                            // Upload image to Firebase Storage
+                            const storageReference = storageRef(storage, 'user_images/' + userId);
+                            uploadBytes(storageReference, userImg)
+                                .then(snapshot => getDownloadURL(snapshot.ref))
+                                .then(url => {
+                                    return set(userRef, {
+                                        userId: userId,
+                                        schoolId: userSchoolId,
+                                        lastName: userLastName,
+                                        firstName: userFirstName,
+                                        middleInitial: userMiddleInitial,
+                                        password: userPassword,
+                                        contactNumber: userContactNumber,
+                                        course: userCourse,
+                                        year: userYear,
+                                        profileImageUrl: url
+                                    });
+                                })
+                                .then(() => {
+                                    alert('User added successfully!');
+                                    document.getElementById('user_id').value = "";
+                                    document.getElementById('user_schoolid').value = "";
+                                    document.getElementById('user_lastname').value = "";
+                                    document.getElementById('user_firstname').value = "";
+                                    document.getElementById('user_middleinitial').value = "";
+                                    document.getElementById('user_password').value = "";
+                                    document.getElementById('user_contactnumber').value = "";
+                                    document.getElementById('user_course').value = ""; // Clear Course Field
+                                    document.getElementById('user_year').value = ""; // Clear Year Dropdown
+                                    document.getElementById('user_img').value = "";
+                                })
+                                .catch(error => alert('Failed to add user: ' + error.message));
+                        }
+                    })
+                    .catch(error => alert('Error checking user ID: ' + error.message));
+            } else {
+                alert('Please fill in all required fields.');
+            }
+        });
 
 
         document.getElementById('updateBook').addEventListener('click', () => {
