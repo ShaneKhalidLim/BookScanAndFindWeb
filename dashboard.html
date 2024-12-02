@@ -665,9 +665,6 @@ document.getElementById('submitSchool').addEventListener('click', () => {
                 });
         }
 
-        // Call this function on page load
-        window.addEventListener('load', editPopulateSchoolDropdown);
-
         // Load librarian data for editing
         function loadEditingLibrarianData() {
             const librarianData = JSON.parse(sessionStorage.getItem("editingLibrarianData"));

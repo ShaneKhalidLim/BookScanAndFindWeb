@@ -600,46 +600,73 @@
         });
 
         document.getElementById('updateBook').addEventListener('click', () => {
-            const bookId = currentEditingBookId;
-            if (!bookId) {
-                console.error("Error: currentEditingBookId is not set.");
-                alert("Error: Book ID is missing. Please try again.");
-                return;
-            }
+    const bookId = currentEditingBookId;
+    if (!bookId) {
+        console.error("Error: currentEditingBookId is not set.");
+        alert("Error: Book ID is missing. Please try again.");
+        return;
+    }
 
-            // Convert shelf fields to integers
-            const bookData = {
-                title: document.getElementById('edit_book_title').value,
-                author: document.getElementById('edit_book_author').value,
-                description: document.getElementById('edit_book_description').value,
-                category: document.getElementById('edit_book_category').value,
-                callnumber: document.getElementById('edit_book_callnumber').value,
-                barcode: document.getElementById('edit_book_barcode').value,
-                shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
-                shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
-                shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
-            };
+    // Collect book data
+    const bookData = {
+        title: document.getElementById('edit_book_title').value.trim(),
+        author: document.getElementById('edit_book_author').value.trim(),
+        description: document.getElementById('edit_book_description').value.trim(),
+        category: document.getElementById('edit_book_category').value.trim(),
+        callnumber: document.getElementById('edit_book_callnumber').value.trim(),
+        barcode: document.getElementById('edit_book_barcode').value.trim(),
+        shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
+        shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
+        shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
+    };
 
-            // Check if shelf values are valid numbers
-            if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
-                alert("Please enter valid numbers for the shelf fields.");
-                return;
-            }
+    // Check if shelf values are valid numbers
+    if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
+        alert("Please enter valid numbers for the shelf fields.");
+        return;
+    }
 
-            console.log("Updating book with data:", bookData);
+    // Get the optional image file
+    const bookImg = document.getElementById('edit_book_img').files[0]; // Optional image
 
-            // Perform the update in Firebase
-            update(ref(database, 'books/' + bookId), bookData)
-                .then(() => {
-                    alert('Book updated successfully');
-                    console.log("Firebase update successful:", bookData);
-                    window.location.href = `bookDetails.html?id=${bookId}`;
-                })
-                .catch(error => {
-                    console.error("Firebase update failed:", error.message);
-                    alert('Failed to update book: ' + error.message);
-                });
-        });
+    // If there's an image, upload it first
+    if (bookImg) {
+        const storageReference = storageRef(storage, 'book_images/' + bookId);
+
+        // Upload the image and get the download URL
+        uploadBytes(storageReference, bookImg)
+            .then(snapshot => getDownloadURL(snapshot.ref))
+            .then(url => {
+                // Update the bookData object with the image URL
+                bookData.imageURL = url;
+
+                // Update all fields in Firebase
+                return update(ref(database, 'books/' + bookId), bookData);
+            })
+            .then(() => {
+                alert('Book updated successfully with image.');
+                console.log("Firebase update successful:", bookData);
+                window.location.href = `bookDetails.html?id=${bookId}`;
+            })
+            .catch(error => {
+                console.error("Failed to update book with image:", error.message);
+                alert('Failed to update book: ' + error.message);
+            });
+    } else {
+        // If no image is provided, just update the book fields
+        update(ref(database, 'books/' + bookId), bookData)
+            .then(() => {
+                alert('Book updated successfully.');
+                console.log("Firebase update successful:", bookData);
+                window.location.href = `bookDetails.html?id=${bookId}`;
+            })
+            .catch(error => {
+                console.error("Failed to update book:", error.message);
+                alert('Failed to update book: ' + error.message);
+            });
+    }
+});
+
 
         document.getElementById('updateUser').addEventListener('click', () => {
             const userId = currentEditingUserId; // Ensure userId is set correctly
@@ -650,14 +677,14 @@
             const userPassword = document.getElementById('edit_user_password').value;
             const userContactNumber = document.getElementById('edit_user_contactnumber').value.trim();
             const userCourse = document.getElementById('edit_user_course').value.trim();
-            const userYear = document.getElementById('edit_user_year').value;
+            const userYear = document.getElementById('edit_user_year').value; // Get year selection
             const userMiddleInitial = document.getElementById('edit_user_middleinitial').value.trim();
             const userImg = document.getElementById('edit_user_img').files[0]; // Optional image
 
             // Prepare userData object with only non-empty fields
             const userData = {
                 schoolId: userSchoolId || null,
-                schoolname: schoolName,
+                schoolname: schoolName || null, // Ensure the selected school value is saved
                 lastName: userLastName || null,
                 firstName: userFirstName || null,
                 password: userPassword || null,
@@ -671,24 +698,18 @@
                 userData.middleInitial = userMiddleInitial;
             }
 
-            // If there's an image, upload and update profileImageUrl1 and profileImageUrl2
+            // If there's an image, upload and update profileImageUrl
             if (userImg) {
-                const storageReference1 = storageRef(storage, 'profile_images/' + userId);
-                const storageReference2 = storageRef(storage, 'profileImages/' + userId);
+                const storageReference = storageRef(storage, 'profile_images/' + userId);
 
-                // Upload to first path and update profileImageUrl1
-                uploadBytes(storageReference1, userImg)
+                // Upload the image to storage and get the download URL
+                uploadBytes(storageReference, userImg)
                     .then(snapshot => getDownloadURL(snapshot.ref))
-                    .then(url1 => {
-                        userData.profileImageUrl1 = url1;
+                    .then(url => {
+                        // Update only the profileImageUrl field
+                        userData.profileImageUrl = url;
 
-                        // Upload to second path and update profileImageUrl2
-                        return uploadBytes(storageReference2, userImg).then(snapshot => getDownloadURL(snapshot.ref));
-                    })
-                    .then(url2 => {
-                        userData.profileImageUrl2 = url2;
-
-                        // Update in Firebase
+                        // Update all fields in Firebase
                         return update(ref(database, 'users/' + userId), userData);
                     })
                     .then(() => {
@@ -697,7 +718,7 @@
                     })
                     .catch(error => alert('Failed to update user: ' + error.message));
             } else {
-                // If no image, update Firebase directly
+                // If no image, update Firebase directly without changing profileImageUrl
                 update(ref(database, 'users/' + userId), userData)
                     .then(() => {
                         alert('User updated successfully');
@@ -706,6 +727,7 @@
                     .catch(error => alert('Failed to update user: ' + error.message));
             }
         });
+
 
         // Display Books (without settings menu)
         function displayBooks() {
