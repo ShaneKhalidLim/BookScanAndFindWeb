@@ -12,6 +12,11 @@
             <h1>Sign In</h1>
             <input type="text" class="modern-input" id="email" name="email" placeholder="Email" />
             <input type="password" class="modern-input" id="password" name="password" placeholder="Password" />
+            <div id="new-password-section" style="display: none;">
+                <input type="password" class="modern-input" id="new-password" name="new-password" placeholder="New Password" />
+                <input type="password" class="modern-input" id="confirm-password" name="confirm-password" placeholder="Confirm Password" />
+                <input type="submit" class="modern-button" id="update-password" name="update-password" value="Update Password" />
+            </div>
             <input type="submit" class="modern-button" id="login" name="login" value="Login" />
         </div>
     </div>
@@ -21,9 +26,10 @@
     </div>
 
     <script type="module">
-        // Firebase configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getDatabase, ref, get, child, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmTgqh5EXrrtRDJYSY6MvVE5gD7pwJfOE",
@@ -39,6 +45,9 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
 
         // Redirect if already logged in
         if (sessionStorage.getItem('loggedIn') === 'true') {
@@ -46,8 +55,7 @@
         }
 
         // Login event listener
-        // Login event listener
-document.getElementById('login').addEventListener('click', async () => {
+        document.getElementById('login').addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
@@ -92,9 +100,36 @@ document.getElementById('login').addEventListener('click', async () => {
                 const librarian = childSnapshot.val();
                 if (librarian.email === email && librarian.password === password) {
                     librarianFound = true;
-                    sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
-                    // Redirect to librarian dashboard
-                    window.location.href = 'librarian.html';
+                    if (password === '123') {
+                        // Show new password fields and require update
+                        const newPassword = prompt('Your password is temporary. Please enter a new password:');
+                        const confirmPassword = prompt('Confirm your new password:');
+
+                        if (!newPassword || !confirmPassword) {
+                            alert('Both fields are required.');
+                            return;
+                        }
+
+                        if (newPassword !== confirmPassword) {
+                            alert('Passwords do not match.');
+                            return;
+                        }
+
+                        // Update the password in the database
+                        const librarianRef = ref(database, `librarians/${childSnapshot.key}`);
+                        update(librarianRef, { password: newPassword })
+                            .then(() => {
+                                alert('Password updated successfully. Please log in again.');
+                                location.reload(); // Reload the page to allow the user to log in again
+                            })
+                            .catch(error => alert(`Error updating password: ${error.message}`));
+                    } else if (librarian.accountStatus === 'Disabled') {
+                        alert('Your account has been disabled. Please contact the administrator.');
+                    } else {
+                        sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+                        // Redirect to librarian dashboard
+                        window.location.href = 'librarian.html';
+                    }
                 }
             });
 
