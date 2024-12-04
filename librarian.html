@@ -303,7 +303,11 @@
         });
 
 
+        // Add Book
         document.getElementById('submitBook').addEventListener('click', () => {
+            const submitButton = document.getElementById('submitBook');
+            submitButton.disabled = true; // Disable the button
+
             const bookId = document.getElementById('book_id').value.trim();
             const bookTitle = document.getElementById('book_title').value.trim();
             const bookAuthor = document.getElementById('book_author').value.trim();
@@ -317,24 +321,21 @@
             const bookStatus = document.getElementById('book_status').value.trim();
             const bookImg = document.getElementById('book_img').files[0];
 
-            // Validate fields
             if (!bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
                 !bookCallNumber || !bookBarcode || isNaN(bookShelfNumber) || 
                 isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg) {
                 alert('Please fill out all fields and select an image.');
+                submitButton.disabled = false; // Re-enable the button
                 return;
             }
 
-            // Validate status selection
             if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
                 alert('Please select a valid status.');
+                submitButton.disabled = false; // Re-enable the button
                 return;
             }
 
-            // Reference to all books in the database
             const booksRef = ref(database, 'books/');
-
-            // Check if call number or barcode already exists
             get(booksRef)
                 .then(snapshot => {
                     if (snapshot.exists()) {
@@ -344,47 +345,41 @@
 
                         if (callNumberExists) {
                             alert('A book with this Call Number already exists. Please use a different Call Number.');
-                            return; // Stop further execution
+                            submitButton.disabled = false; // Re-enable the button
+                            return;
                         }
 
                         if (barcodeExists) {
                             alert('A book with this Barcode already exists. Please use a different Barcode.');
-                            return; // Stop further execution
+                            submitButton.disabled = false; // Re-enable the button
+                            return;
                         }
 
-                        // Reference to the specific book ID
                         const bookRef = ref(database, 'books/' + bookId);
-
-                        // Check if the book ID already exists
                         get(bookRef)
                             .then(snapshot => {
                                 if (snapshot.exists()) {
                                     alert('A book with this ID already exists. Please use a different ID.');
                                 } else {
-                                    // Upload image to Firebase Storage
                                     const storageReference = storageRef(storage, 'book_images/' + bookId);
                                     uploadBytes(storageReference, bookImg)
                                         .then(snapshot => getDownloadURL(snapshot.ref))
-                                        .then(url => {
-                                            // Save book data to Firebase Realtime Database
-                                            return set(bookRef, {
-                                                id: bookId,
-                                                title: bookTitle,
-                                                author: bookAuthor,
-                                                description: bookDescription,
-                                                category: bookCategory,
-                                                callnumber: bookCallNumber,
-                                                barcode: bookBarcode,
-                                                shelfNumber: bookShelfNumber, 
-                                                shelfRow: bookShelfRow,
-                                                shelfColumn: bookShelfColumn,
-                                                bookStatus: bookStatus,
-                                                imageURL: url
-                                            });
-                                        })
+                                        .then(url => set(bookRef, {
+                                            id: bookId,
+                                            title: bookTitle,
+                                            author: bookAuthor,
+                                            description: bookDescription,
+                                            category: bookCategory,
+                                            callnumber: bookCallNumber,
+                                            barcode: bookBarcode,
+                                            shelfNumber: bookShelfNumber,
+                                            shelfRow: bookShelfRow,
+                                            shelfColumn: bookShelfColumn,
+                                            bookStatus: bookStatus,
+                                            imageURL: url
+                                        }))
                                         .then(() => {
                                             alert('Book added successfully.');
-                                            // Reset form fields after success
                                             document.getElementById('book_id').value = '';
                                             document.getElementById('book_img').value = '';
                                             document.getElementById('book_title').value = '';
@@ -398,16 +393,23 @@
                                             document.getElementById('book_shelfColumn').value = '';
                                             document.getElementById('book_status').value = '';
                                         })
-                                        .catch(error => alert('Failed to add book: ' + error.message));
+                                        .catch(error => alert('Failed to add book: ' + error.message))
+                                        .finally(() => submitButton.disabled = false); // Re-enable the button
                                 }
                             })
-                            .catch(error => alert('Error checking book ID: ' + error.message));
+                            .catch(error => {
+                                alert('Error checking book ID: ' + error.message);
+                                submitButton.disabled = false; // Re-enable the button
+                            });
                     } else {
-                        // Handle case where no books exist in the database yet
                         alert('No existing books found in the database.');
+                        submitButton.disabled = false; // Re-enable the button
                     }
                 })
-                .catch(error => alert('Error checking Call Number or Barcode: ' + error.message));
+                .catch(error => {
+                    alert('Error checking Call Number or Barcode: ' + error.message);
+                    submitButton.disabled = false; // Re-enable the button
+                });
         });
 
         document.getElementById('generateBarcode').addEventListener('click', () => {
@@ -477,7 +479,11 @@
         // Call this function on page load
         window.addEventListener('load', populateSchoolDropdowns);
         
+        // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
+            const submitButton = document.getElementById('submitUser');
+            submitButton.disabled = true; // Disable the button
+
             const userId = document.getElementById('user_id').value.trim();
             const userSchoolId = document.getElementById('user_schoolid').value.trim();
             const userLastName = document.getElementById('user_lastname').value.trim();
@@ -489,22 +495,11 @@
             const userYear = document.getElementById('user_year').value;
             const userImg = document.getElementById('user_img').files[0];
 
-            // Validate user fields
-            if (
-                userId &&
-                userSchoolId &&
-                userLastName &&
-                userFirstName &&
-                userPassword &&
-                userContactNumber &&
-                userCourse &&
-                userYear &&
-                userImg
-            ) {
-                // Reference to all users in the database
+            if (userId && userSchoolId && userLastName && userFirstName &&
+                userPassword && userContactNumber && userCourse &&
+                userYear && userImg) {
                 const usersRef = ref(database, 'users/');
 
-                // Check for duplicate userId, schoolId, or book_id
                 get(usersRef)
                     .then(snapshot => {
                         if (snapshot.exists()) {
@@ -514,158 +509,160 @@
 
                             if (userIdExists) {
                                 alert('A user with this ID already exists. Please use a different ID.');
-                                return; // Stop further execution
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
                             }
 
                             if (schoolIdExists) {
                                 alert('A user with this School ID already exists. Please use a different School ID.');
-                                return; // Stop further execution
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
                             }
 
-                            // If no duplicates found, upload the image and save the user data
                             const userRef = ref(database, 'users/' + userId);
                             const storageReference = storageRef(storage, 'user_images/' + userId);
 
                             uploadBytes(storageReference, userImg)
                                 .then(snapshot => getDownloadURL(snapshot.ref))
-                                .then(url => {
-                                    return set(userRef, {
-                                        userId: userId,
-                                        schoolId: userSchoolId,
-                                        lastName: userLastName,
-                                        firstName: userFirstName,
-                                        middleInitial: userMiddleInitial,
-                                        password: userPassword,
-                                        contactNumber: userContactNumber,
-                                        course: userCourse,
-                                        year: userYear,
-                                        profileImageUrl: url
-                                    });
-                                })
+                                .then(url => set(userRef, {
+                                    userId: userId,
+                                    schoolId: userSchoolId,
+                                    lastName: userLastName,
+                                    firstName: userFirstName,
+                                    middleInitial: userMiddleInitial,
+                                    password: userPassword,
+                                    contactNumber: userContactNumber,
+                                    course: userCourse,
+                                    year: userYear,
+                                    profileImageUrl: url
+                                }))
                                 .then(() => {
                                     alert('User added successfully!');
-                                    document.getElementById('user_id').value = "";
-                                    document.getElementById('user_schoolid').value = "";
-                                    document.getElementById('user_lastname').value = "";
-                                    document.getElementById('user_firstname').value = "";
-                                    document.getElementById('user_middleinitial').value = "";
-                                    document.getElementById('user_password').value = "";
-                                    document.getElementById('user_contactnumber').value = "";
-                                    document.getElementById('user_course').value = ""; // Clear Course Field
-                                    document.getElementById('user_year').value = ""; // Clear Year Dropdown
-                                    document.getElementById('user_img').value = "";
+                                    document.getElementById('user_id').value = '';
+                                    document.getElementById('user_schoolid').value = '';
+                                    document.getElementById('user_lastname').value = '';
+                                    document.getElementById('user_firstname').value = '';
+                                    document.getElementById('user_middleinitial').value = '';
+                                    document.getElementById('user_password').value = '';
+                                    document.getElementById('user_contactnumber').value = '';
+                                    document.getElementById('user_course').value = '';
+                                    document.getElementById('user_year').value = '';
+                                    document.getElementById('user_img').value = '';
                                 })
-                                .catch(error => alert('Failed to add user: ' + error.message));
+                                .catch(error => alert('Failed to add user: ' + error.message))
+                                .finally(() => submitButton.disabled = false); // Re-enable the button
                         } else {
-                            // Handle case where no users exist in the database yet
                             const userRef = ref(database, 'users/' + userId);
                             const storageReference = storageRef(storage, 'user_images/' + userId);
 
                             uploadBytes(storageReference, userImg)
                                 .then(snapshot => getDownloadURL(snapshot.ref))
-                                .then(url => {
-                                    return set(userRef, {
-                                        userId: userId,
-                                        schoolId: userSchoolId,
-                                        lastName: userLastName,
-                                        firstName: userFirstName,
-                                        middleInitial: userMiddleInitial,
-                                        password: userPassword,
-                                        contactNumber: userContactNumber,
-                                        course: userCourse,
-                                        year: userYear,
-                                        profileImageUrl: url
-                                    });
-                                })
+                                .then(url => set(userRef, {
+                                    userId: userId,
+                                    schoolId: userSchoolId,
+                                    lastName: userLastName,
+                                    firstName: userFirstName,
+                                    middleInitial: userMiddleInitial,
+                                    password: userPassword,
+                                    contactNumber: userContactNumber,
+                                    course: userCourse,
+                                    year: userYear,
+                                    profileImageUrl: url
+                                }))
                                 .then(() => {
                                     alert('User added successfully!');
-                                    document.getElementById('user_id').value = "";
-                                    document.getElementById('user_schoolid').value = "";
-                                    document.getElementById('user_lastname').value = "";
-                                    document.getElementById('user_firstname').value = "";
-                                    document.getElementById('user_middleinitial').value = "";
-                                    document.getElementById('user_password').value = "";
-                                    document.getElementById('user_contactnumber').value = "";
-                                    document.getElementById('user_course').value = ""; // Clear Course Field
-                                    document.getElementById('user_year').value = ""; // Clear Year Dropdown
-                                    document.getElementById('user_img').value = "";
+                                    document.getElementById('user_id').value = '';
+                                    document.getElementById('user_schoolid').value = '';
+                                    document.getElementById('user_lastname').value = '';
+                                    document.getElementById('user_firstname').value = '';
+                                    document.getElementById('user_middleinitial').value = '';
+                                    document.getElementById('user_password').value = '';
+                                    document.getElementById('user_contactnumber').value = '';
+                                    document.getElementById('user_course').value = '';
+                                    document.getElementById('user_year').value = '';
+                                    document.getElementById('user_img').value = '';
                                 })
-                                .catch(error => alert('Failed to add user: ' + error.message));
+                                .catch(error => alert('Failed to add user: ' + error.message))
+                                .finally(() => submitButton.disabled = false); // Re-enable the button
                         }
                     })
-                    .catch(error => alert('Error checking User ID or School ID: ' + error.message));
+                    .catch(error => {
+                        alert('Error checking User ID or School ID: ' + error.message);
+                        submitButton.disabled = false; // Re-enable the button
+                    });
             } else {
                 alert('Please fill in all required fields.');
+                submitButton.disabled = false; // Re-enable the button
             }
         });
 
         document.getElementById('updateBook').addEventListener('click', () => {
-    const bookId = currentEditingBookId;
-    if (!bookId) {
-        console.error("Error: currentEditingBookId is not set.");
-        alert("Error: Book ID is missing. Please try again.");
-        return;
-    }
+            const bookId = currentEditingBookId;
+            if (!bookId) {
+                console.error("Error: currentEditingBookId is not set.");
+                alert("Error: Book ID is missing. Please try again.");
+                return;
+            }
 
-    // Collect book data
-    const bookData = {
-        title: document.getElementById('edit_book_title').value.trim(),
-        author: document.getElementById('edit_book_author').value.trim(),
-        description: document.getElementById('edit_book_description').value.trim(),
-        category: document.getElementById('edit_book_category').value.trim(),
-        callnumber: document.getElementById('edit_book_callnumber').value.trim(),
-        barcode: document.getElementById('edit_book_barcode').value.trim(),
-        shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
-        shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
-        shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
-    };
+            // Collect book data
+            const bookData = {
+                title: document.getElementById('edit_book_title').value.trim(),
+                author: document.getElementById('edit_book_author').value.trim(),
+                description: document.getElementById('edit_book_description').value.trim(),
+                category: document.getElementById('edit_book_category').value.trim(),
+                callnumber: document.getElementById('edit_book_callnumber').value.trim(),
+                barcode: document.getElementById('edit_book_barcode').value.trim(),
+                shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
+                shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
+                shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
+            };
 
-    // Check if shelf values are valid numbers
-    if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
-        alert("Please enter valid numbers for the shelf fields.");
-        return;
-    }
+            // Check if shelf values are valid numbers
+            if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
+                alert("Please enter valid numbers for the shelf fields.");
+                return;
+            }
 
-    // Get the optional image file
-    const bookImg = document.getElementById('edit_book_img').files[0]; // Optional image
+            // Get the optional image file
+            const bookImg = document.getElementById('edit_book_img').files[0]; // Optional image
 
-    // If there's an image, upload it first
-    if (bookImg) {
-        const storageReference = storageRef(storage, 'book_images/' + bookId);
+            // If there's an image, upload it first
+            if (bookImg) {
+                const storageReference = storageRef(storage, 'book_images/' + bookId);
 
-        // Upload the image and get the download URL
-        uploadBytes(storageReference, bookImg)
-            .then(snapshot => getDownloadURL(snapshot.ref))
-            .then(url => {
-                // Update the bookData object with the image URL
-                bookData.imageURL = url;
+                // Upload the image and get the download URL
+                uploadBytes(storageReference, bookImg)
+                    .then(snapshot => getDownloadURL(snapshot.ref))
+                    .then(url => {
+                        // Update the bookData object with the image URL
+                        bookData.imageURL = url;
 
-                // Update all fields in Firebase
-                return update(ref(database, 'books/' + bookId), bookData);
-            })
-            .then(() => {
-                alert('Book updated successfully with image.');
-                console.log("Firebase update successful:", bookData);
-                window.location.href = `bookDetails.html?id=${bookId}`;
-            })
-            .catch(error => {
-                console.error("Failed to update book with image:", error.message);
-                alert('Failed to update book: ' + error.message);
-            });
-    } else {
-        // If no image is provided, just update the book fields
-        update(ref(database, 'books/' + bookId), bookData)
-            .then(() => {
-                alert('Book updated successfully.');
-                console.log("Firebase update successful:", bookData);
-                window.location.href = `bookDetails.html?id=${bookId}`;
-            })
-            .catch(error => {
-                console.error("Failed to update book:", error.message);
-                alert('Failed to update book: ' + error.message);
-            });
-    }
-});
+                        // Update all fields in Firebase
+                        return update(ref(database, 'books/' + bookId), bookData);
+                    })
+                    .then(() => {
+                        alert('Book updated successfully with image.');
+                        console.log("Firebase update successful:", bookData);
+                        window.location.href = `bookDetails.html?id=${bookId}`;
+                    })
+                    .catch(error => {
+                        console.error("Failed to update book with image:", error.message);
+                        alert('Failed to update book: ' + error.message);
+                    });
+            } else {
+                // If no image is provided, just update the book fields
+                update(ref(database, 'books/' + bookId), bookData)
+                    .then(() => {
+                        alert('Book updated successfully.');
+                        console.log("Firebase update successful:", bookData);
+                        window.location.href = `bookDetails.html?id=${bookId}`;
+                    })
+                    .catch(error => {
+                        console.error("Failed to update book:", error.message);
+                        alert('Failed to update book: ' + error.message);
+                    });
+            }
+        });
 
 
         document.getElementById('updateUser').addEventListener('click', () => {

@@ -219,84 +219,94 @@
         // Call this function on page load
         window.addEventListener('load', populateSchoolDropdown);
 
-        // Add School
-document.getElementById('submitSchool').addEventListener('click', () => {
-    const schoolName = document.getElementById('school_name').value.trim();
-    const schoolLocation = document.getElementById('school_location').value.trim();
-    const schoolContactNum = document.getElementById('school_contactnum').value.trim();
-    const schoolImg = document.getElementById('school_img').files[0];
+       // Add School
+        document.getElementById('submitSchool').addEventListener('click', () => {
+            const submitButton = document.getElementById('submitSchool');
+            submitButton.disabled = true; // Disable the button
 
-    if (schoolName && schoolLocation && schoolContactNum && schoolImg) {
-        // Reference to all schools in the database
-        const schoolsRef = ref(database, 'schools/');
+            const schoolName = document.getElementById('school_name').value.trim();
+            const schoolLocation = document.getElementById('school_location').value.trim();
+            const schoolContactNum = document.getElementById('school_contactnum').value.trim();
+            const schoolImg = document.getElementById('school_img').files[0];
 
-        // Check for duplicate school name
-        get(schoolsRef)
-            .then(snapshot => {
-                if (snapshot.exists()) {
-                    const schools = snapshot.val();
-                    const schoolNameExists = Object.values(schools).some(school => school.name.toLowerCase() === schoolName.toLowerCase());
+            if (schoolName && schoolLocation && schoolContactNum && schoolImg) {
+                const schoolsRef = ref(database, 'schools/');
 
-                    if (schoolNameExists) {
-                        alert('A school with this name already exists. Please use a different name.');
-                        return; // Stop further execution
-                    }
+                get(schoolsRef)
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            const schools = snapshot.val();
+                            const schoolNameExists = Object.values(schools).some(school => school.name.toLowerCase() === schoolName.toLowerCase());
 
-                    // If no duplicate name, proceed to add the school
-                    const schoolId = push(ref(database, 'schools')).key;
-                    const storageReference = storageRef(storage, 'school_images/' + schoolId);
+                            if (schoolNameExists) {
+                                alert('A school with this name already exists. Please use a different name.');
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
+                            }
 
-                    uploadBytes(storageReference, schoolImg)
-                        .then(snapshot => getDownloadURL(snapshot.ref))
-                        .then(url => set(ref(database, 'schools/' + schoolId), {
-                            name: schoolName,
-                            location: schoolLocation,
-                            contactNum: schoolContactNum,
-                            imageUrl: url
-                        }))
-                        .then(() => {
-                            alert('School added successfully');
-                            displaySchools();
-                            document.getElementById('school_img').value = '';
-                            document.getElementById('school_name').value = '';
-                            document.getElementById('school_location').value = '';
-                            document.getElementById('school_contactnum').value = '';
-                        })
-                        .catch(error => alert('Failed to add school: ' + error.message));
-                } else {
-                    // Handle case where no schools exist in the database yet
-                    const schoolId = push(ref(database, 'schools')).key;
-                    const storageReference = storageRef(storage, 'school_images/' + schoolId);
+                            const schoolId = push(ref(database, 'schools')).key;
+                            const storageReference = storageRef(storage, 'school_images/' + schoolId);
 
-                    uploadBytes(storageReference, schoolImg)
-                        .then(snapshot => getDownloadURL(snapshot.ref))
-                        .then(url => set(ref(database, 'schools/' + schoolId), {
-                            name: schoolName,
-                            location: schoolLocation,
-                            contactNum: schoolContactNum,
-                            imageUrl: url
-                        }))
-                        .then(() => {
-                            alert('School added successfully');
-                            displaySchools();
-                            document.getElementById('school_img').value = '';
-                            document.getElementById('school_name').value = '';
-                            document.getElementById('school_location').value = '';
-                            document.getElementById('school_contactnum').value = '';
-                        })
-                        .catch(error => alert('Failed to add school: ' + error.message));
-                }
-            })
-            .catch(error => alert('Error checking school name: ' + error.message));
-    } else {
-        alert('All fields are required');
-    }
-});
+                            uploadBytes(storageReference, schoolImg)
+                                .then(snapshot => getDownloadURL(snapshot.ref))
+                                .then(url => set(ref(database, 'schools/' + schoolId), {
+                                    name: schoolName,
+                                    location: schoolLocation,
+                                    contactNum: schoolContactNum,
+                                    imageUrl: url
+                                }))
+                                .then(() => {
+                                    alert('School added successfully');
+                                    displaySchools();
+                                    document.getElementById('school_img').value = '';
+                                    document.getElementById('school_name').value = '';
+                                    document.getElementById('school_location').value = '';
+                                    document.getElementById('school_contactnum').value = '';
+                                })
+                                .catch(error => alert('Failed to add school: ' + error.message))
+                                .finally(() => submitButton.disabled = false); // Re-enable the button
+                        } else {
+                            const schoolId = push(ref(database, 'schools')).key;
+                            const storageReference = storageRef(storage, 'school_images/' + schoolId);
 
+                            uploadBytes(storageReference, schoolImg)
+                                .then(snapshot => getDownloadURL(snapshot.ref))
+                                .then(url => set(ref(database, 'schools/' + schoolId), {
+                                    name: schoolName,
+                                    location: schoolLocation,
+                                    contactNum: schoolContactNum,
+                                    imageUrl: url
+                                }))
+                                .then(() => {
+                                    alert('School added successfully');
+                                    displaySchools();
+                                    document.getElementById('school_img').value = '';
+                                    document.getElementById('school_name').value = '';
+                                    document.getElementById('school_location').value = '';
+                                    document.getElementById('school_contactnum').value = '';
+                                })
+                                .catch(error => alert('Failed to add school: ' + error.message))
+                                .finally(() => submitButton.disabled = false); // Re-enable the button
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error checking school name: ' + error.message);
+                        submitButton.disabled = false; // Re-enable the button
+                    });
+            } else {
+                alert('All fields are required');
+                submitButton.disabled = false; // Re-enable the button
+            }
+        });
+
+        // Add Librarian
         document.getElementById('submitLibrarian').addEventListener('click', () => {
+            const submitButton = document.getElementById('submitLibrarian');
+            submitButton.disabled = true; // Disable the button
+
             const libId = document.getElementById('lib_id').value.trim();
-            const schoolId = document.getElementById('lib_school_id').value.trim(); // Inputted School ID
-            const schoolName = document.getElementById('lib_school_select').value; // Selected School Name
+            const schoolId = document.getElementById('lib_school_id').value.trim();
+            const schoolName = document.getElementById('lib_school_select').value;
             const libLastName = document.getElementById('lib_lastname').value.trim();
             const libFirstName = document.getElementById('lib_firstname').value.trim();
             const libMiddleInitial = document.getElementById('lib_middleinitial').value.trim();
@@ -306,10 +316,8 @@ document.getElementById('submitSchool').addEventListener('click', () => {
             const libEmail = document.getElementById('lib_email').value.trim();
             const libImg = document.getElementById('lib_img').files[0];
 
-            // Email validation regex
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            // Validate that all required fields are filled and email is valid
             if (
                 libId &&
                 schoolId &&
@@ -324,13 +332,12 @@ document.getElementById('submitSchool').addEventListener('click', () => {
             ) {
                 if (!emailRegex.test(libEmail)) {
                     alert('Please enter a valid email address.');
+                    submitButton.disabled = false; // Re-enable the button
                     return;
                 }
 
-                // Reference to all librarians in the database
                 const librariansRef = ref(database, 'librarians/');
 
-                // Check if the schoolId or email already exists
                 get(librariansRef)
                     .then(snapshot => {
                         if (snapshot.exists()) {
@@ -339,36 +346,33 @@ document.getElementById('submitSchool').addEventListener('click', () => {
                             const emailExists = Object.values(librarians).some(librarian => librarian.email === libEmail);
 
                             if (schoolIdExists) {
-                                // If the schoolId already exists, alert the user
                                 alert('A librarian with this School ID already exists. Please use a different School ID.');
-                                return; // Stop further execution
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
                             }
 
                             if (emailExists) {
-                                // If the email already exists, alert the user
                                 alert('A librarian with this email already exists. Please use a different email.');
-                                return; // Stop further execution
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
                             }
 
-                            // Reference to the specific librarian ID
                             const librarianRef = ref(database, 'librarians/' + libId);
 
-                            // Check if the librarian ID already exists
                             get(librarianRef)
                                 .then(snapshot => {
                                     if (snapshot.exists()) {
                                         alert('A librarian with this ID already exists. Please use a different ID.');
+                                        submitButton.disabled = false; // Re-enable the button
                                     } else {
-                                        // Upload image to Firebase Storage
                                         const storageReference = storageRef(storage, 'librarian_images/' + libId);
                                         uploadBytes(storageReference, libImg)
                                             .then(snapshot => getDownloadURL(snapshot.ref))
                                             .then(url => {
-                                                // Save librarian data to Firebase Realtime Database
                                                 const librarianData = {
                                                     id: libId,
-                                                    schoolId: schoolId, // Save the inputted School ID
-                                                    schoolName: schoolName, // Save the selected School Name
+                                                    schoolId: schoolId,
+                                                    schoolName: schoolName,
                                                     lastName: libLastName,
                                                     firstName: libFirstName,
                                                     middleInitial: libMiddleInitial,
@@ -383,7 +387,6 @@ document.getElementById('submitSchool').addEventListener('click', () => {
                                             })
                                             .then(() => {
                                                 alert('Librarian added successfully!');
-                                                // Reset form fields after success
                                                 document.getElementById('lib_id').value = '';
                                                 document.getElementById('lib_school_id').value = '';
                                                 document.getElementById('lib_school_select').value = '';
@@ -396,20 +399,29 @@ document.getElementById('submitSchool').addEventListener('click', () => {
                                                 document.getElementById('lib_email').value = '';
                                                 document.getElementById('lib_img').value = '';
                                             })
-                                            .catch(error => alert('Error adding librarian: ' + error.message));
+                                            .catch(error => alert('Error adding librarian: ' + error.message))
+                                            .finally(() => submitButton.disabled = false); // Re-enable the button
                                     }
                                 })
-                                .catch(error => alert('Error checking librarian ID: ' + error.message));
+                                .catch(error => {
+                                    alert('Error checking librarian ID: ' + error.message);
+                                    submitButton.disabled = false; // Re-enable the button
+                                });
                         } else {
-                            // Handle case where no librarians exist in the database yet
                             alert('No existing librarians found in the database.');
+                            submitButton.disabled = false; // Re-enable the button
                         }
                     })
-                    .catch(error => alert('Error checking School ID or Email: ' + error.message));
+                    .catch(error => {
+                        alert('Error checking School ID or Email: ' + error.message);
+                        submitButton.disabled = false; // Re-enable the button
+                    });
             } else {
                 alert('Please fill out all fields.');
+                submitButton.disabled = false; // Re-enable the button
             }
         });
+
 
 
         // Update Dashboard Chart
