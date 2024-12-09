@@ -17,11 +17,12 @@
 }
 
 .modern-button {
-    background-color: #304D6D; /* Dark blue-gray */
-    color: white;
+    background-color: #dfc274; /* Dark blue-gray */
+    color: #332214;
     padding: 12px 20px;
-    border: none;
+    border: 1px solid #332214;
     border-radius: 8px;
+    
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
@@ -33,17 +34,18 @@
 
 /* Add School and Librarian Section Styling */
 #addSchool, #addLibrarian {
-    background: #a7cced; /* Light sky-blue background */
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(1, 1, 1, 1);
-    padding: 20px;
-    margin: 20px auto;
-    max-width: 600px;
+    background: url('Images/background.png') no-repeat center center; /* Use an image as the background */
+    background-size: cover; /* Ensures the image covers the entire element */
+    border-radius: 10px; /* Keeps the rounded corners */
+    box-shadow: 0 0 10px rgba(1, 1, 1, 1); /* Keeps the box shadow */
+    padding: 20px; /* Maintains spacing inside the element */
+    margin: 20px auto; /* Centers the element */
+    max-width: 600px; /* Limits the width */
 }
 
 #addSchool h2, #addLibrarian h2 {
     margin-bottom: 20px;
-    color: #304D6D; /* Dark blue-gray */
+    color: #332214; 
     font-size: 24px;
     font-weight: 600;
 }
@@ -56,21 +58,26 @@
 /* Existing Styles */
 body {
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-start; /* Keeps your layout alignment */
     align-items: stretch;
     height: 100vh;
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(to bottom, #A7CCED, #82A0BC); /* Gradient with light sky-blue and blue-gray */
+
+    /* Background Image */
+    background: url('Images/background2.png') no-repeat center center fixed;
+    background-size: cover; /* Ensures the image covers the entire viewport */
 }
+
 
 /* Login Box Styling */
 #login-box {
-    background: #A7CCED; /* Light sky-blue */
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    padding: 40px;
+    background: url('Images/background.png') no-repeat center center; /* Sets the image as background */
+    background-size: auto; /* Keeps the original size of the image */
+    border-radius: 10px; /* Keeps the rounded corners */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Keeps the box shadow */
+    width: 300px; /* Width of the box */
+    padding: 40px; /* Padding for content inside the box */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,7 +96,8 @@ body {
 
 #navbar {
     width: 220px;
-    background-color: #304D6D; /* Dark blue-gray */
+    background: url('Images/background.png') no-repeat center center; /* Set the image as background */
+    background-size: cover; /* Ensures the image covers the entire navbar */
     color: white;
     padding: 20px;
     position: fixed;
@@ -101,15 +109,17 @@ body {
     z-index: 1000;
 }
 
+
 #navbar .logo h1 {
     margin: 0;
+    color: #332214;
     font-size: 28px;
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 #navbar ul li a {
-    color: #304D6D; /* Light sky-blue */
+    color: #332214; /* Light sky-blue */
     text-decoration: none;
     font-size: 20px; /* Larger font size */
     display: block;
@@ -119,11 +129,11 @@ body {
 }
 
 #navbar ul li a:hover {
-    background-color: #545E75; /* Dark slate-blue */
+    background-color: #d38237; /* Dark slate-blue */
 }
 
 #navbar ul li a {
-    color: #304D6D; /* Light sky-blue */
+    color: #332214; /* Light sky-blue */
     text-decoration: none;
     font-size: 18px;
     display: block;
@@ -133,7 +143,7 @@ body {
 }
 
 #navbar ul li a:hover {
-    background-color: #63ADF2; /* Medium blue */
+    background-color: #d38237; /* Medium blue */
     color: #ffffff;
 }
 
@@ -141,7 +151,7 @@ body {
     flex: 1;
     padding: 30px; /* Increase padding */
     margin-left: 280px; /* Adjust margin to accommodate larger navbar */
-    background-color: #A7CCED;
+    background: url('Images/backgroun2.png') no-repeat center center;
     overflow-y: auto;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1); /* Larger shadow */
 }
@@ -186,10 +196,10 @@ body {
 
 h2 {
     margin: 0 0 20px;
-    color: #304D6D; /* Dark blue-gray */
+    color: #6d4130; /* Dark blue-gray */
     font-size: 24px;
     font-weight: 600;
-    border-bottom: 2px solid #63ADF2; /* Medium blue */
+    border-bottom: 2px solid #6d4130; /* Medium blue */
     padding-bottom: 10px;
 }
 
@@ -375,7 +385,7 @@ h2 {
 
 .book-item .details {
     font-size: 16px;
-    color: #304D6D; /* Dark blue-gray */
+    color: #332214; /* Dark blue-gray */
     padding: 15px 0;
     text-align: center;
     line-height: 1.6;
@@ -413,23 +423,23 @@ ul {
 li {
     margin: 10px 0;
     border: 1px solid #0e0e0e; /* Blue-gray border */
-    background-color: #A7CCED; /* Light sky-blue */
+    background-color: #dfc274; /* Light sky-blue */
     border-radius: 5px;
     padding: 10px;
-    color: #A7CCED; /* Dark blue-gray */
+    color: #d38237; /* Dark blue-gray */
     transition: background-color 0.3s, color 0.3s;
     max-width: 400px;
 }
 
 li:hover {
-    background-color: #A7CCED; /* Medium blue on hover */
+    background-color: #d38237; /* Medium blue on hover */
     color: white;
 }
 
 /* H2 Tag Border Fix */
 h2 {
     margin: 0 0 20px;
-    color: #304D6D; /* Dark blue-gray */
+    color: #332214; /* Dark blue-gray */
     font-size: 24px;
     font-weight: 600;
     border-bottom: 2px solid #545E75; /* Dark slate-blue */
@@ -438,33 +448,35 @@ h2 {
 
 /* Modern Input Focus State */
 .modern-input:focus {
-    border-color: #63ADF2; /* Medium blue */
+    border-color: #332214; /* Medium blue */
     outline: none;
-    background-color: #A7CCED; /* Light sky-blue */
+    background-color: #dfc274; /* Light sky-blue */
 }
 
 /* Modern Button Hover Fix */
 .modern-button:hover {
-    background-color: #63ADF2; /* Medium blue */
+    background-color: #d38237; /* Medium blue */
     color: #ffffff; /* Ensure white text on hover */
 }
 
 /* Navbar Links - Hover Consistency */
 #navbar ul li a:hover {
-    background-color: #545E75; /* Dark slate-blue */
+    background-color: #79522f; /* Dark slate-blue */
     color: #A7CCED; /* Light sky-blue */
 }
 
 .section {
     display: none;
-    background-color: #a7cced; /* Light sky-blue for hidden sections */
-    color: #000000; /* Dark blue-gray text */
+    background: url('Images/background.png') no-repeat center center; /* Use an image as the background */
+    background-size: cover; /* Ensures the image covers the entire section */
+    color: #000000; /* Keeps the dark blue-gray text color */
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(1, 1, 1, 1);
     margin: 20px auto;
     max-width: 1200px;
 }
+
 
 #dashboard {
     display: block;
@@ -480,7 +492,7 @@ h2 {
     height: 250px;
     object-fit: contain; /* Ensure consistent sizing */
     border-radius: 8px 8px 0 0;
-    background-color: #A7CCED; /* Light sky-blue background for empty images */
+    background-color: #dfc274; /* Light sky-blue background for empty images */
 }
 /* Apply a grid layout to the book and user lists */
 #booksList, #usersList {
@@ -497,7 +509,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #a7cced;
+    background: #dfc274;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -528,7 +540,7 @@ h2 {
 .book-item:hover, .user-item:hover {
     transform: scale(1.05);
     transition: transform 0.3s ease;
-    background: #a0d3ff;
+    background: #d38237;
 }
 /* Common grid layout for lists */
 #schoolsList, #librariansList, #usersList {
@@ -545,7 +557,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #a7cced;
+    background: #dfc274;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -572,5 +584,5 @@ h2 {
 .school-item:hover, .librarian-item:hover, .user-item:hover {
     transform: scale(1.05);
     transition: transform 0.3s ease;
-    background: #a0d3ff;
+    background: #d38237;
 }
