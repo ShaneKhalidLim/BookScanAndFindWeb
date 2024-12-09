@@ -61,7 +61,7 @@
                 <button id="generateBarcode" class="modern-button">Generate Barcode</button>
             </div>
             <div id="barcodeDisplay" style="text-align: center; margin-top: 20px; display: none;">
-                <img id="barcodeImage" alt="Barcode" src="" style="margin-bottom: 10px;"/>
+                <img id="barcodeImage" alt="Barcode" src="" style="margin-bottom: 10px; padding-left: 20px; padding-right: 20px;"/>
                 <div>
                     <button id="downloadBarcode" class="modern-button" style="margin-top: 10px;">View Barcode</button>
                 </div>
@@ -303,77 +303,74 @@
 
 
         document.getElementById('submitBook').addEventListener('click', () => {
-    const bookId = document.getElementById('book_id').value.trim();
-    const bookTitle = document.getElementById('book_title').value.trim();
-    const bookAuthor = document.getElementById('book_author').value.trim();
-    const bookDescription = document.getElementById('book_description').value.trim();
-    const bookCategory = document.getElementById('book_category').value.trim();
-    const bookCallNumber = document.getElementById('book_callnumber').value.trim();
-    const bookBarcode = document.getElementById('book_barcode').value.trim();
-    const bookShelfNumber = parseInt(document.getElementById('book_shelfNumber').value.trim(), 10);
-    const bookShelfRow = parseInt(document.getElementById('book_shelfRow').value.trim(), 10);
-    const bookShelfColumn = parseInt(document.getElementById('book_shelfColumn').value.trim(), 10);
-    const bookStatus = document.getElementById('book_status').value.trim();
-    const bookImg = document.getElementById('book_img').files[0];
+            const bookId = document.getElementById('book_id').value.trim();
+            const bookTitle = document.getElementById('book_title').value.trim();
+            const bookAuthor = document.getElementById('book_author').value.trim();
+            const bookDescription = document.getElementById('book_description').value.trim();
+            const bookCategory = document.getElementById('book_category').value.trim();
+            const bookCallNumber = document.getElementById('book_callnumber').value.trim();
+            const bookBarcode = document.getElementById('book_barcode').value.trim();
+            const bookShelfNumber = document.getElementById('book_shelfNumber').value;
+            const bookShelfRow = document.getElementById('book_shelfRow').value;
+            const bookShelfColumn = document.getElementById('book_shelfColumn').value;
+            const bookStatus = document.getElementById('book_status').value;
+            const bookImg = document.getElementById('book_img').files[0];
 
-    // Validate all required fields are filled
-    if (
-        !bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
-        !bookCallNumber || !bookBarcode || isNaN(bookShelfNumber) || 
-        isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg
-    ) {
-        alert('Please fill out all fields and select an image.');
-        return;
-    }
+            // Validate all required fields are filled
+            if (!bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory || 
+                !bookCallNumber || !bookBarcode || !bookShelfNumber || !bookShelfRow || !bookShelfColumn || 
+                !bookStatus || !bookImg) {
+                alert('Please fill out all fields and select an image.');
+                return;
+            }
 
-    // Validate that a valid status is selected
-    if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
-        alert('Please select a valid status.');
-        return;
-    }
+            // Validate that a valid status is selected
+            if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
+                alert('Please select a valid status.');
+                return;
+            }
 
-    // Reference to the storage and database paths
-    const storageReference = storageRef(storage, 'book_images/' + bookId);
+            // Reference to the storage and database paths
+            const storageReference = storageRef(storage, 'book_images/' + bookId);
 
-    // Upload the book image
-    uploadBytes(storageReference, bookImg)
-        .then(snapshot => getDownloadURL(snapshot.ref))
-        .then(url => {
-            // Set book data in the Firebase database
-            return set(ref(database, 'books/' + bookId), {
-                id: bookId,
-                title: bookTitle,
-                author: bookAuthor,
-                description: bookDescription,
-                category: bookCategory,
-                callnumber: bookCallNumber,
-                barcode: bookBarcode,
-                shelfNumber: bookShelfNumber, // Stored as integer
-                shelfRow: bookShelfRow,       // Stored as integer
-                shelfColumn: bookShelfColumn, // Stored as integer
-                bookStatus: bookStatus,
-                imageURL: url
-            });
-        })
-        .then(() => {
-            alert('Book added successfully.');
-            // Clear input fields after success
-            document.getElementById('book_id').value = '';
-            document.getElementById('book_img').value = '';
-            document.getElementById('book_title').value = '';
-            document.getElementById('book_author').value = '';
-            document.getElementById('book_description').value = '';
-            document.getElementById('book_category').value = '';
-            document.getElementById('book_callnumber').value = '';
-            document.getElementById('book_barcode').value = '';
-            document.getElementById('book_shelfNumber').value = '';
-            document.getElementById('book_shelfRow').value = '';
-            document.getElementById('book_shelfColumn').value = '';
-            document.getElementById('book_status').value = '';
-        })
-        .catch(error => alert('Failed to add book: ' + error.message));
-});
-
+            // Upload the book image
+            uploadBytes(storageReference, bookImg)
+                .then(snapshot => getDownloadURL(snapshot.ref))
+                .then(url => {
+                    // Set book data in the Firebase database
+                    return set(ref(database, 'books/' + bookId), {
+                        id: bookId,
+                        title: bookTitle,
+                        author: bookAuthor,
+                        description: bookDescription,
+                        category: bookCategory,
+                        callnumber: bookCallNumber,
+                        barcode: bookBarcode,
+                        shelfNumber: bookShelfNumber,
+                        shelfRow: bookShelfRow,
+                        shelfColumn: bookShelfColumn,
+                        bookStatus: bookStatus,
+                        imageURL: url
+                    });
+                })
+                .then(() => {
+                    alert('Book added successfully.');
+                    // Clear input fields after success
+                    document.getElementById('book_id').value = '';
+                    document.getElementById('book_img').value = '';
+                    document.getElementById('book_title').value = '';
+                    document.getElementById('book_author').value = '';
+                    document.getElementById('book_description').value = '';
+                    document.getElementById('book_category').value = '';
+                    document.getElementById('book_callnumber').value = '';
+                    document.getElementById('book_barcode').value = '';
+                    document.getElementById('book_shelfNumber').value = '';
+                    document.getElementById('book_shelfRow').value = '';
+                    document.getElementById('book_shelfColumn').value = '';
+                    document.getElementById('book_status').value = '';
+                })
+                .catch(error => alert('Failed to add book: ' + error.message));
+        });
 
         document.getElementById('generateBarcode').addEventListener('click', () => {
             const barcodeData = document.getElementById('barcodeData').value.trim();
