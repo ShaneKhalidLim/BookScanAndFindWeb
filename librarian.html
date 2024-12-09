@@ -34,7 +34,6 @@
             <!-- Add Book Section -->
         <div id="addBook" class="section">
             <h2>Add Book</h2>
-            <input type="text" id="book_id" placeholder="Book ID" class="modern-input"> <!-- Book ID Field -->
             <input type="file" id="book_img" class="modern-input">
             <input type="text" id="book_title" placeholder="Book Title" class="modern-input">
             <input type="text" id="book_author" placeholder="Author" class="modern-input">
@@ -99,7 +98,6 @@
             <!-- Add User Section -->
             <div id="addUser" class="section">
                 <h2>Add User</h2>
-                <input type="text" id="user_id" placeholder="User ID" class="modern-input"> <!-- User ID Field -->
                 <input type="file" id="user_img" class="modern-input">
                  <!-- School Dropdown -->
                 <select id="user_school_select" class="modern-input">
@@ -109,7 +107,6 @@
                 <input type="text" id="user_lastname" placeholder="Last Name" class="modern-input">
                 <input type="text" id="user_firstname" placeholder="First Name" class="modern-input">
                 <input type="text" id="user_middleinitial" placeholder="Middle Initial (optional)" class="modern-input">
-                <input type="password" id="user_password" placeholder="Password" class="modern-input">
                 <input type="text" id="user_contactnumber" placeholder="Contact Number" class="modern-input">
                 
                 <!-- Course Dropdown -->
@@ -268,7 +265,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { getDatabase, ref, get, child, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getDatabase, ref, get, push, child, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
@@ -303,12 +300,11 @@
         });
 
 
-        // Add Book
+       // Add Book
         document.getElementById('submitBook').addEventListener('click', () => {
             const submitButton = document.getElementById('submitBook');
             submitButton.disabled = true; // Disable the button
 
-            const bookId = document.getElementById('book_id').value.trim();
             const bookTitle = document.getElementById('book_title').value.trim();
             const bookAuthor = document.getElementById('book_author').value.trim();
             const bookDescription = document.getElementById('book_description').value.trim();
@@ -321,7 +317,7 @@
             const bookStatus = document.getElementById('book_status').value.trim();
             const bookImg = document.getElementById('book_img').files[0];
 
-            if (!bookId || !bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
+            if (!bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
                 !bookCallNumber || !bookBarcode || isNaN(bookShelfNumber) || 
                 isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg) {
                 alert('Please fill out all fields and select an image.');
@@ -355,52 +351,42 @@
                             return;
                         }
 
-                        const bookRef = ref(database, 'books/' + bookId);
-                        get(bookRef)
-                            .then(snapshot => {
-                                if (snapshot.exists()) {
-                                    alert('A book with this ID already exists. Please use a different ID.');
-                                } else {
-                                    const storageReference = storageRef(storage, 'book_images/' + bookId);
-                                    uploadBytes(storageReference, bookImg)
-                                        .then(snapshot => getDownloadURL(snapshot.ref))
-                                        .then(url => set(bookRef, {
-                                            id: bookId,
-                                            title: bookTitle,
-                                            author: bookAuthor,
-                                            description: bookDescription,
-                                            category: bookCategory,
-                                            callnumber: bookCallNumber,
-                                            barcode: bookBarcode,
-                                            shelfNumber: bookShelfNumber,
-                                            shelfRow: bookShelfRow,
-                                            shelfColumn: bookShelfColumn,
-                                            bookStatus: bookStatus,
-                                            imageURL: url
-                                        }))
-                                        .then(() => {
-                                            alert('Book added successfully.');
-                                            document.getElementById('book_id').value = '';
-                                            document.getElementById('book_img').value = '';
-                                            document.getElementById('book_title').value = '';
-                                            document.getElementById('book_author').value = '';
-                                            document.getElementById('book_description').value = '';
-                                            document.getElementById('book_category').value = '';
-                                            document.getElementById('book_callnumber').value = '';
-                                            document.getElementById('book_barcode').value = '';
-                                            document.getElementById('book_shelfNumber').value = '';
-                                            document.getElementById('book_shelfRow').value = '';
-                                            document.getElementById('book_shelfColumn').value = '';
-                                            document.getElementById('book_status').value = '';
-                                        })
-                                        .catch(error => alert('Failed to add book: ' + error.message))
-                                        .finally(() => submitButton.disabled = false); // Re-enable the button
-                                }
+                        const newBookRef = push(booksRef); // Generate a unique ID for the book
+                        const bookId = newBookRef.key; // Retrieve the generated key
+
+                        const storageReference = storageRef(storage, 'book_images/' + bookId);
+                        uploadBytes(storageReference, bookImg)
+                            .then(snapshot => getDownloadURL(snapshot.ref))
+                            .then(url => set(newBookRef, {
+                                id: bookId,
+                                title: bookTitle,
+                                author: bookAuthor,
+                                description: bookDescription,
+                                category: bookCategory,
+                                callnumber: bookCallNumber,
+                                barcode: bookBarcode,
+                                shelfNumber: bookShelfNumber,
+                                shelfRow: bookShelfRow,
+                                shelfColumn: bookShelfColumn,
+                                bookStatus: bookStatus,
+                                imageURL: url
+                            }))
+                            .then(() => {
+                                alert('Book added successfully.');
+                                document.getElementById('book_title').value = '';
+                                document.getElementById('book_author').value = '';
+                                document.getElementById('book_description').value = '';
+                                document.getElementById('book_category').value = '';
+                                document.getElementById('book_callnumber').value = '';
+                                document.getElementById('book_barcode').value = '';
+                                document.getElementById('book_shelfNumber').value = '';
+                                document.getElementById('book_shelfRow').value = '';
+                                document.getElementById('book_shelfColumn').value = '';
+                                document.getElementById('book_status').value = '';
+                                document.getElementById('book_img').value = '';
                             })
-                            .catch(error => {
-                                alert('Error checking book ID: ' + error.message);
-                                submitButton.disabled = false; // Re-enable the button
-                            });
+                            .catch(error => alert('Failed to add book: ' + error.message))
+                            .finally(() => submitButton.disabled = false); // Re-enable the button
                     } else {
                         alert('No existing books found in the database.');
                         submitButton.disabled = false; // Re-enable the button
@@ -411,6 +397,7 @@
                     submitButton.disabled = false; // Re-enable the button
                 });
         });
+
 
         document.getElementById('generateBarcode').addEventListener('click', () => {
             const barcodeData = document.getElementById('barcodeData').value.trim();
@@ -481,69 +468,67 @@
         
         // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
-            const submitButton = document.getElementById('submitUser');
-            submitButton.disabled = true; // Disable the button
+                const submitButton = document.getElementById('submitUser');
+                submitButton.disabled = true; // Disable the button
 
-            const userId = document.getElementById('user_id').value.trim();
-            const userSchoolId = document.getElementById('user_schoolid').value.trim();
-            const userLastName = document.getElementById('user_lastname').value.trim();
-            const userFirstName = document.getElementById('user_firstname').value.trim();
-            const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
-            const userPassword = document.getElementById('user_password').value;
-            const userContactNumber = document.getElementById('user_contactnumber').value.trim();
-            const userCourse = document.getElementById('user_course').value.trim();
-            const userYear = document.getElementById('user_year').value;
-            const userImg = document.getElementById('user_img').files[0];
+                const userSchoolId = document.getElementById('user_schoolid').value.trim();
+                const userLastName = document.getElementById('user_lastname').value.trim();
+                const userFirstName = document.getElementById('user_firstname').value.trim();
+                const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
+                const userContactNumber = document.getElementById('user_contactnumber').value.trim();
+                const userCourse = document.getElementById('user_course').value.trim();
+                const userYear = document.getElementById('user_year').value;
+                const userImg = document.getElementById('user_img').files[0];
 
-            if (userId && userSchoolId && userLastName && userFirstName &&
-                userPassword && userContactNumber && userCourse &&
-                userYear && userImg) {
-                const usersRef = ref(database, 'users/');
+                if (userSchoolId && userLastName && userFirstName &&
+                    userContactNumber && userCourse &&
+                    userYear && userImg) {
+                    
+                    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP as the password
 
-                get(usersRef)
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            const users = snapshot.val();
-                            const userIdExists = Object.values(users).some(user => user.userId === userId);
-                            const schoolIdExists = Object.values(users).some(user => user.schoolId === userSchoolId);
+                    const usersRef = ref(database, 'users/');
+                    
+                    get(usersRef)
+                        .then(snapshot => {
+                            if (snapshot.exists()) {
+                                const users = snapshot.val();
+                                const schoolIdExists = Object.values(users).some(user => user.schoolId === userSchoolId);
 
-                            if (userIdExists) {
-                                alert('A user with this ID already exists. Please use a different ID.');
-                                submitButton.disabled = false; // Re-enable the button
-                                return;
+                                if (schoolIdExists) {
+                                    alert('A user with this School ID already exists. Please use a different School ID.');
+                                    submitButton.disabled = false; // Re-enable the button
+                                    return;
+                                }
                             }
-
-                            if (schoolIdExists) {
-                                alert('A user with this School ID already exists. Please use a different School ID.');
-                                submitButton.disabled = false; // Re-enable the button
-                                return;
-                            }
-
-                            const userRef = ref(database, 'users/' + userId);
+                            
+                            const newUserRef = push(usersRef); // Generate a unique ID
+                            const userId = newUserRef.key; // Retrieve the generated key
                             const storageReference = storageRef(storage, 'user_images/' + userId);
 
                             uploadBytes(storageReference, userImg)
                                 .then(snapshot => getDownloadURL(snapshot.ref))
-                                .then(url => set(userRef, {
+                                .then(url => set(newUserRef, {
                                     userId: userId,
                                     schoolId: userSchoolId,
                                     lastName: userLastName,
                                     firstName: userFirstName,
                                     middleInitial: userMiddleInitial,
-                                    password: userPassword,
+                                    password: otp, // Set the OTP as the password
                                     contactNumber: userContactNumber,
                                     course: userCourse,
                                     year: userYear,
                                     profileImageUrl: url
                                 }))
                                 .then(() => {
-                                    alert('User added successfully!');
-                                    document.getElementById('user_id').value = '';
+                                    // Open SMS app to send OTP
+                                    const message = `This is you one time password: ${otp}`;
+                                    window.location.href = `sms:${userContactNumber}?body=${encodeURIComponent(message)}`;
+
+                                    alert('User added successfully and OTP has been sent!');
                                     document.getElementById('user_schoolid').value = '';
                                     document.getElementById('user_lastname').value = '';
                                     document.getElementById('user_firstname').value = '';
                                     document.getElementById('user_middleinitial').value = '';
-                                    document.getElementById('user_password').value = '';
                                     document.getElementById('user_contactnumber').value = '';
                                     document.getElementById('user_course').value = '';
                                     document.getElementById('user_year').value = '';
@@ -551,50 +536,17 @@
                                 })
                                 .catch(error => alert('Failed to add user: ' + error.message))
                                 .finally(() => submitButton.disabled = false); // Re-enable the button
-                        } else {
-                            const userRef = ref(database, 'users/' + userId);
-                            const storageReference = storageRef(storage, 'user_images/' + userId);
-
-                            uploadBytes(storageReference, userImg)
-                                .then(snapshot => getDownloadURL(snapshot.ref))
-                                .then(url => set(userRef, {
-                                    userId: userId,
-                                    schoolId: userSchoolId,
-                                    lastName: userLastName,
-                                    firstName: userFirstName,
-                                    middleInitial: userMiddleInitial,
-                                    password: userPassword,
-                                    contactNumber: userContactNumber,
-                                    course: userCourse,
-                                    year: userYear,
-                                    profileImageUrl: url
-                                }))
-                                .then(() => {
-                                    alert('User added successfully!');
-                                    document.getElementById('user_id').value = '';
-                                    document.getElementById('user_schoolid').value = '';
-                                    document.getElementById('user_lastname').value = '';
-                                    document.getElementById('user_firstname').value = '';
-                                    document.getElementById('user_middleinitial').value = '';
-                                    document.getElementById('user_password').value = '';
-                                    document.getElementById('user_contactnumber').value = '';
-                                    document.getElementById('user_course').value = '';
-                                    document.getElementById('user_year').value = '';
-                                    document.getElementById('user_img').value = '';
-                                })
-                                .catch(error => alert('Failed to add user: ' + error.message))
-                                .finally(() => submitButton.disabled = false); // Re-enable the button
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error checking User ID or School ID: ' + error.message);
-                        submitButton.disabled = false; // Re-enable the button
-                    });
-            } else {
-                alert('Please fill in all required fields.');
-                submitButton.disabled = false; // Re-enable the button
-            }
+                        })
+                        .catch(error => {
+                            alert('Error checking School ID: ' + error.message);
+                            submitButton.disabled = false; // Re-enable the button
+                        });
+                } else {
+                    alert('Please fill in all required fields.');
+                    submitButton.disabled = false; // Re-enable the button
+                }
         });
+
 
         document.getElementById('updateBook').addEventListener('click', () => {
             const bookId = currentEditingBookId;

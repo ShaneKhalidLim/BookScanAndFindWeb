@@ -47,7 +47,6 @@
             <div id="addLibrarian" class="section">
                 <h2>Add Librarian</h2>
 
-                <input type="text" id="lib_id" placeholder="Unique ID (Manual Input)" class="modern-input">
                 <!-- Dropdown for selecting school -->
                 <select id="lib_school_select" class="modern-input">
                     <option value="" disabled selected>Select School</option>
@@ -57,7 +56,6 @@
                 <input type="text" id="lib_lastname" placeholder="Librarian Last Name" class="modern-input">
                 <input type="text" id="lib_firstname" placeholder="Librarian First Name" class="modern-input">
                 <input type="text" id="lib_middleinitial" placeholder="Librarian Middle Initial (optional)" class="modern-input">
-                <input type="password" id="lib_password" placeholder="Password" class="modern-input">
                 <input type="text" id="lib_contactnum" placeholder="Librarian Contact Number" class="modern-input">
                 <input type="text" id="lib_role" placeholder="Librarian Role" class="modern-input">
                 <input type="email" id="lib_email" placeholder="Librarian Email" class="modern-input">
@@ -299,128 +297,117 @@
             }
         });
 
-        // Add Librarian
         document.getElementById('submitLibrarian').addEventListener('click', () => {
-            const submitButton = document.getElementById('submitLibrarian');
-            submitButton.disabled = true; // Disable the button
+                const submitButton = document.getElementById('submitLibrarian');
+                submitButton.disabled = true; // Disable the button
+                const schoolId = document.getElementById('lib_school_id').value.trim();
+                const schoolName = document.getElementById('lib_school_select').value;
+                const libLastName = document.getElementById('lib_lastname').value.trim();
+                const libFirstName = document.getElementById('lib_firstname').value.trim();
+                const libMiddleInitial = document.getElementById('lib_middleinitial').value.trim();
+                const libContactNum = document.getElementById('lib_contactnum').value.trim();
+                const libRole = document.getElementById('lib_role').value.trim();
+                const libEmail = document.getElementById('lib_email').value.trim();
+                const libImg = document.getElementById('lib_img').files[0];
 
-            const libId = document.getElementById('lib_id').value.trim();
-            const schoolId = document.getElementById('lib_school_id').value.trim();
-            const schoolName = document.getElementById('lib_school_select').value;
-            const libLastName = document.getElementById('lib_lastname').value.trim();
-            const libFirstName = document.getElementById('lib_firstname').value.trim();
-            const libMiddleInitial = document.getElementById('lib_middleinitial').value.trim();
-            const libPassword = document.getElementById('lib_password').value.trim();
-            const libContactNum = document.getElementById('lib_contactnum').value.trim();
-            const libRole = document.getElementById('lib_role').value.trim();
-            const libEmail = document.getElementById('lib_email').value.trim();
-            const libImg = document.getElementById('lib_img').files[0];
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (
-                libId &&
-                schoolId &&
-                schoolName &&
-                libLastName &&
-                libFirstName &&
-                libPassword &&
-                libContactNum &&
-                libRole &&
-                libEmail &&
-                libImg
-            ) {
-                if (!emailRegex.test(libEmail)) {
-                    alert('Please enter a valid email address.');
-                    submitButton.disabled = false; // Re-enable the button
-                    return;
-                }
-
-                const librariansRef = ref(database, 'librarians/');
-
-                get(librariansRef)
-                    .then(snapshot => {
-                        if (snapshot.exists()) {
-                            const librarians = snapshot.val();
-                            const schoolIdExists = Object.values(librarians).some(librarian => librarian.schoolId === schoolId);
-                            const emailExists = Object.values(librarians).some(librarian => librarian.email === libEmail);
-
-                            if (schoolIdExists) {
-                                alert('A librarian with this School ID already exists. Please use a different School ID.');
-                                submitButton.disabled = false; // Re-enable the button
-                                return;
-                            }
-
-                            if (emailExists) {
-                                alert('A librarian with this email already exists. Please use a different email.');
-                                submitButton.disabled = false; // Re-enable the button
-                                return;
-                            }
-
-                            const librarianRef = ref(database, 'librarians/' + libId);
-
-                            get(librarianRef)
-                                .then(snapshot => {
-                                    if (snapshot.exists()) {
-                                        alert('A librarian with this ID already exists. Please use a different ID.');
-                                        submitButton.disabled = false; // Re-enable the button
-                                    } else {
-                                        const storageReference = storageRef(storage, 'librarian_images/' + libId);
-                                        uploadBytes(storageReference, libImg)
-                                            .then(snapshot => getDownloadURL(snapshot.ref))
-                                            .then(url => {
-                                                const librarianData = {
-                                                    id: libId,
-                                                    schoolId: schoolId,
-                                                    schoolName: schoolName,
-                                                    lastName: libLastName,
-                                                    firstName: libFirstName,
-                                                    middleInitial: libMiddleInitial,
-                                                    contactNum: libContactNum,
-                                                    role: libRole,
-                                                    email: libEmail,
-                                                    password: libPassword,
-                                                    imageUrl: url,
-                                                };
-
-                                                return set(librarianRef, librarianData);
-                                            })
-                                            .then(() => {
-                                                alert('Librarian added successfully!');
-                                                document.getElementById('lib_id').value = '';
-                                                document.getElementById('lib_school_id').value = '';
-                                                document.getElementById('lib_school_select').value = '';
-                                                document.getElementById('lib_lastname').value = '';
-                                                document.getElementById('lib_firstname').value = '';
-                                                document.getElementById('lib_middleinitial').value = '';
-                                                document.getElementById('lib_password').value = '';
-                                                document.getElementById('lib_contactnum').value = '';
-                                                document.getElementById('lib_role').value = '';
-                                                document.getElementById('lib_email').value = '';
-                                                document.getElementById('lib_img').value = '';
-                                            })
-                                            .catch(error => alert('Error adding librarian: ' + error.message))
-                                            .finally(() => submitButton.disabled = false); // Re-enable the button
-                                    }
-                                })
-                                .catch(error => {
-                                    alert('Error checking librarian ID: ' + error.message);
-                                    submitButton.disabled = false; // Re-enable the button
-                                });
-                        } else {
-                            alert('No existing librarians found in the database.');
-                            submitButton.disabled = false; // Re-enable the button
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error checking School ID or Email: ' + error.message);
+                if (
+                    schoolId &&
+                    schoolName &&
+                    libLastName &&
+                    libFirstName &&
+                    libContactNum &&
+                    libRole &&
+                    libEmail &&
+                    libImg
+                ) {
+                    if (!emailRegex.test(libEmail)) {
+                        alert('Please enter a valid email address.');
                         submitButton.disabled = false; // Re-enable the button
-                    });
-            } else {
-                alert('Please fill out all fields.');
-                submitButton.disabled = false; // Re-enable the button
-            }
+                        return;
+                    }
+
+                    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+
+                    const librariansRef = ref(database, 'librarians/');
+
+                    get(librariansRef)
+                        .then(snapshot => {
+                            if (snapshot.exists()) {
+                                const librarians = snapshot.val();
+                                const schoolIdExists = Object.values(librarians).some(librarian => librarian.schoolId === schoolId);
+                                const emailExists = Object.values(librarians).some(librarian => librarian.email === libEmail);
+
+                                if (schoolIdExists) {
+                                    alert('A librarian with this School ID already exists. Please use a different School ID.');
+                                    submitButton.disabled = false; // Re-enable the button
+                                    return;
+                                }
+
+                                if (emailExists) {
+                                    alert('A librarian with this email already exists. Please use a different email.');
+                                    submitButton.disabled = false; // Re-enable the button
+                                    return;
+                                }
+
+                                // Auto-generate a unique ID
+                                const newLibrarianRef = push(librariansRef);
+                                const newLibId = newLibrarianRef.key;
+
+                                const storageReference = storageRef(storage, 'librarian_images/' + newLibId);
+                                uploadBytes(storageReference, libImg)
+                                    .then(snapshot => getDownloadURL(snapshot.ref))
+                                    .then(url => {
+                                        const librarianData = {
+                                            id: newLibId,
+                                            schoolId: schoolId,
+                                            schoolName: schoolName,
+                                            lastName: libLastName,
+                                            firstName: libFirstName,
+                                            middleInitial: libMiddleInitial,
+                                            contactNum: libContactNum,
+                                            role: libRole,
+                                            email: libEmail,
+                                            password: otp, // Set OTP as password
+                                            imageUrl: url,
+                                        };
+
+                                        return set(newLibrarianRef, librarianData);
+                                    })
+                                    .then(() => {
+                                        // Open SMS app to send OTP
+                                        const message = `Your OTP for registration is: ${otp}`;
+                                        window.location.href = `sms:${libContactNum}?body=${encodeURIComponent(message)}`;
+
+                                        alert('Librarian added successfully and OTP has been sent!');
+                                        document.getElementById('lib_school_id').value = '';
+                                        document.getElementById('lib_school_select').value = '';
+                                        document.getElementById('lib_lastname').value = '';
+                                        document.getElementById('lib_firstname').value = '';
+                                        document.getElementById('lib_middleinitial').value = '';
+                                        document.getElementById('lib_contactnum').value = '';
+                                        document.getElementById('lib_role').value = '';
+                                        document.getElementById('lib_email').value = '';
+                                        document.getElementById('lib_img').value = '';
+                                    })
+                                    .catch(error => alert('Error adding librarian: ' + error.message))
+                                    .finally(() => submitButton.disabled = false); // Re-enable the button
+                            } else {
+                                alert('No existing librarians found in the database.');
+                                submitButton.disabled = false; // Re-enable the button
+                            }
+                        })
+                        .catch(error => {
+                            alert('Error checking School ID or Email: ' + error.message);
+                            submitButton.disabled = false; // Re-enable the button
+                        });
+                } else {
+                    alert('Please fill out all fields.');
+                    submitButton.disabled = false; // Re-enable the button
+                }
         });
+
 
 
 
