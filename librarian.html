@@ -468,48 +468,61 @@
         
         // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
-                const submitButton = document.getElementById('submitUser');
-                submitButton.disabled = true; // Disable the button
+            const submitButton = document.getElementById('submitUser');
+            submitButton.disabled = true; // Disable the button
 
-                const userSchoolId = document.getElementById('user_schoolid').value.trim();
-                const userLastName = document.getElementById('user_lastname').value.trim();
-                const userFirstName = document.getElementById('user_firstname').value.trim();
-                const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
-                const userContactNumber = document.getElementById('user_contactnumber').value.trim();
-                const userCourse = document.getElementById('user_course').value.trim();
-                const userYear = document.getElementById('user_year').value;
-                const userImg = document.getElementById('user_img').files[0];
+            const userSchoolId = document.getElementById('user_schoolid').value.trim();
+            const userSchoolName = document.getElementById('user_school_select').value.trim(); // Added schoolname
+            const userLastName = document.getElementById('user_lastname').value.trim();
+            const userFirstName = document.getElementById('user_firstname').value.trim();
+            const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
+            const userContactNumber = document.getElementById('user_contactnumber').value.trim();
+            const userCourse = document.getElementById('user_course').value.trim();
+            const userYear = document.getElementById('user_year').value;
+            const userImg = document.getElementById('user_img').files[0];
 
-                if (userSchoolId && userLastName && userFirstName &&
-                    userContactNumber && userCourse &&
-                    userYear && userImg) {
-                    
-                    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP as the password
+            if (
+                userSchoolId &&
+                userSchoolName && // Validate schoolname
+                userLastName &&
+                userFirstName &&
+                userContactNumber &&
+                userCourse &&
+                userYear &&
+                userImg
+            ) {
+                const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP as the password
 
-                    const usersRef = ref(database, 'users/');
-                    
-                    get(usersRef)
-                        .then(snapshot => {
-                            if (snapshot.exists()) {
-                                const users = snapshot.val();
-                                const schoolIdExists = Object.values(users).some(user => user.schoolId === userSchoolId);
+                const usersRef = ref(database, 'users/');
 
-                                if (schoolIdExists) {
-                                    alert('A user with this School ID already exists. Please use a different School ID.');
-                                    submitButton.disabled = false; // Re-enable the button
-                                    return;
-                                }
+                get(usersRef)
+                    .then((snapshot) => {
+                        if (snapshot.exists()) {
+                            const users = snapshot.val();
+                            const schoolIdExists = Object.values(users).some(
+                                (user) => user.schoolId === userSchoolId
+                            );
+
+                            if (schoolIdExists) {
+                                alert(
+                                    'A user with this School ID already exists. Please use a different School ID.'
+                                );
+                                submitButton.disabled = false; // Re-enable the button
+                                return;
                             }
-                            
-                            const newUserRef = push(usersRef); // Generate a unique ID
-                            const userId = newUserRef.key; // Retrieve the generated key
-                            const storageReference = storageRef(storage, 'user_images/' + userId);
+                        }
 
-                            uploadBytes(storageReference, userImg)
-                                .then(snapshot => getDownloadURL(snapshot.ref))
-                                .then(url => set(newUserRef, {
+                        const newUserRef = push(usersRef); // Generate a unique ID
+                        const userId = newUserRef.key; // Retrieve the generated key
+                        const storageReference = storageRef(storage, 'user_images/' + userId);
+
+                        uploadBytes(storageReference, userImg)
+                            .then((snapshot) => getDownloadURL(snapshot.ref))
+                            .then((url) =>
+                                set(newUserRef, {
                                     userId: userId,
                                     schoolId: userSchoolId,
+                                    schoolname: userSchoolName, // Save as schoolname
                                     lastName: userLastName,
                                     firstName: userFirstName,
                                     middleInitial: userMiddleInitial,
@@ -517,36 +530,41 @@
                                     contactNumber: userContactNumber,
                                     course: userCourse,
                                     year: userYear,
-                                    profileImageUrl: url
-                                }))
-                                .then(() => {
-                                    // Open SMS app to send OTP
-                                    const message = `This is you one time password: ${otp}`;
-                                    window.location.href = `sms:${userContactNumber}?body=${encodeURIComponent(message)}`;
-
-                                    alert('User added successfully and OTP has been sent!');
-                                    document.getElementById('user_schoolid').value = '';
-                                    document.getElementById('user_lastname').value = '';
-                                    document.getElementById('user_firstname').value = '';
-                                    document.getElementById('user_middleinitial').value = '';
-                                    document.getElementById('user_contactnumber').value = '';
-                                    document.getElementById('user_course').value = '';
-                                    document.getElementById('user_year').value = '';
-                                    document.getElementById('user_img').value = '';
+                                    profileImageUrl: url,
                                 })
-                                .catch(error => alert('Failed to add user: ' + error.message))
-                                .finally(() => submitButton.disabled = false); // Re-enable the button
-                        })
-                        .catch(error => {
-                            alert('Error checking School ID: ' + error.message);
-                            submitButton.disabled = false; // Re-enable the button
-                        });
-                } else {
-                    alert('Please fill in all required fields.');
-                    submitButton.disabled = false; // Re-enable the button
-                }
-        });
+                            )
+                            .then(() => {
+                                // Open SMS app to send OTP
+                                const message = `This is your one-time password: ${otp}`;
+                                window.location.href = `sms:${userContactNumber}?body=${encodeURIComponent(
+                                    message
+                                )}`;
 
+                                alert('User added successfully and OTP has been sent!');
+                                document.getElementById('user_schoolid').value = '';
+                                document.getElementById('user_school_select').value = ''; // Clear schoolname
+                                document.getElementById('user_lastname').value = '';
+                                document.getElementById('user_firstname').value = '';
+                                document.getElementById('user_middleinitial').value = '';
+                                document.getElementById('user_contactnumber').value = '';
+                                document.getElementById('user_course').value = '';
+                                document.getElementById('user_year').value = '';
+                                document.getElementById('user_img').value = '';
+                            })
+                            .catch((error) =>
+                                alert('Failed to add user: ' + error.message)
+                            )
+                            .finally(() => (submitButton.disabled = false)); // Re-enable the button
+                    })
+                    .catch((error) => {
+                        alert('Error checking School ID: ' + error.message);
+                        submitButton.disabled = false; // Re-enable the button
+                    });
+            } else {
+                alert('Please fill in all required fields.');
+                submitButton.disabled = false; // Re-enable the button
+            }
+        });
 
         document.getElementById('updateBook').addEventListener('click', () => {
             const bookId = currentEditingBookId;
