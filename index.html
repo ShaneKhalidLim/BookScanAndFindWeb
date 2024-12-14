@@ -100,53 +100,57 @@
                 const librarian = childSnapshot.val();
 
                 if (librarian.email === email) {
-                    librarianFound = true;
+    librarianFound = true;
 
-                    // Check if the password is an OTP
-                    const isOTP = /^\d{6}$/.test(password); // Assuming OTP is a 6-digit number
-                    if (isOTP && librarian.password === password) {
-                        // Show new password fields
-                        document.getElementById('new-password-section').style.display = 'block';
-                        document.getElementById('login').style.display = 'none';
+    // Check if the password is an OTP
+    const isOTP = /^\d{6}$/.test(password); // Assuming OTP is a 6-digit number
+    if (isOTP && librarian.password === password) {
+        // Show new password fields
+        document.getElementById('new-password-section').style.display = 'block';
+        document.getElementById('login').style.display = 'none';
 
-                        // Update password when confirmed
-                        document.getElementById('update-password').addEventListener('click', async () => {
-                            const newPassword = document.getElementById('new-password').value.trim();
-                            const confirmPassword = document.getElementById('confirm-password').value.trim();
+        // Update password when confirmed
+        document.getElementById('update-password').addEventListener('click', async () => {
+            const newPassword = document.getElementById('new-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
 
-                            if (!newPassword || !confirmPassword) {
-                                alert('Please fill in both new password fields.');
-                                return;
-                            }
+            if (!newPassword || !confirmPassword) {
+                alert('Please fill in both new password fields.');
+                return;
+            }
 
-                            if (newPassword !== confirmPassword) {
-                                alert('New password and confirm password do not match.');
-                                return;
-                            }
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirm password do not match.');
+                return;
+            }
 
-                            try {
-                                // Update password in the database
-                                const librarianRef = ref(database, `librarians/${childSnapshot.key}`);
-                                await update(librarianRef, { password: newPassword });
+            try {
+                // Update password in the database
+                const librarianRef = ref(database, `librarians/${childSnapshot.key}`);
+                await update(librarianRef, { password: newPassword });
 
-                                alert('Password updated successfully. Please log in again.');
-                                location.reload(); // Reload the page to allow the user to log in again
-                            } catch (error) {
-                                alert(`Error updating password: ${error.message}`);
-                            }
-                        });
-                    } else if (librarian.password === password) {
-                        // Proceed with normal login if the password is not an OTP
-                        if (librarian.accountStatus === 'Disabled') {
-                            alert('Your account has been disabled. Please contact the administrator.');
-                        } else {
-                            sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
-                            window.location.href = 'librarian.html'; // Redirect to librarian dashboard
-                        }
-                    } else {
-                        alert('Email or password is incorrect.');
-                    }
-                }
+                alert('Password updated successfully. Please log in again.');
+                location.reload(); // Reload the page to allow the user to log in again
+            } catch (error) {
+                alert(`Error updating password: ${error.message}`);
+            }
+        });
+    } else if (librarian.password === password) {
+        // Proceed with normal login if the password is not an OTP
+        if (librarian.accountStatus === 'Disabled') {
+            alert('Your account has been disabled. Please contact the administrator.');
+        } else {
+            // Store the librarian's ID and school name in sessionStorage
+            sessionStorage.setItem('loggedIn', 'true'); // Mark user as logged in
+            sessionStorage.setItem('loggedInLibrarianId', childSnapshot.key); // Save librarian ID
+            sessionStorage.setItem('librarianSchool', librarian.schoolName); // Save school name
+            window.location.href = 'librarian.html'; // Redirect to librarian dashboard
+        }
+    } else {
+        alert('Email or password is incorrect.');
+    }
+}
+
             });
 
             if (!librarianFound) {
