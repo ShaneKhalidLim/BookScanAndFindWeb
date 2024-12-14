@@ -720,40 +720,87 @@
 
         // Display Users (without settings menu)
         function displayUsers() {
-            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
-            const courseFilter = document.getElementById('userCourseFilter').value;
-            const yearFilter = document.getElementById('userYearFilter').value;
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = '';
+    const loggedInSchool = sessionStorage.getItem('librarianSchool'); // Retrieve the logged-in librarian's school
 
-            get(child(ref(database), 'users')).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const user = childSnapshot.val();
-                        const userId = childSnapshot.key;
+    if (!loggedInSchool) {
+        alert('No school information found for the logged-in librarian.');
+        return;
+    }
 
-                        const matchesSearch = `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery);
-                        const matchesCourse = !courseFilter || user.course === courseFilter;
-                        const matchesYear = !yearFilter || user.year === yearFilter;
+    const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
+    const courseFilter = document.getElementById('userCourseFilter').value;
+    const yearFilter = document.getElementById('userYearFilter').value;
+    const usersList = document.getElementById('usersList');
+    usersList.innerHTML = '';
 
-                        if (matchesSearch && matchesCourse && matchesYear) {
-                            const listItem = document.createElement('li');
-                            listItem.className = 'user-item';
-                            listItem.dataset.id = userId;
-                            listItem.innerHTML = `
-                                <a href="userDetails.html?id=${userId}">
-                                    <img src="${user.profileImageUrl}" alt="User Image">
-                                    <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
-                                </a>
-                            `;
-                            usersList.appendChild(listItem);
-                        }
-                    });
-                } else {
-                    usersList.innerHTML = '<li>No users registered</li>';
+    get(child(ref(database), 'users')).then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const user = childSnapshot.val();
+                const userId = childSnapshot.key;
+
+                // Filter users by school
+                if (user.schoolname !== loggedInSchool) {
+                    return; // Skip users not from the same school
                 }
-            }).catch(error => alert('Failed to retrieve users: ' + error.message));
+
+                const matchesSearch = `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery);
+                const matchesCourse = !courseFilter || user.course === courseFilter;
+                const matchesYear = !yearFilter || user.year === yearFilter;
+
+                if (matchesSearch && matchesCourse && matchesYear) {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'user-item';
+                    listItem.dataset.id = userId;
+                    listItem.innerHTML = `
+                        <a href="userDetails.html?id=${userId}">
+                            <img src="${user.profileImageUrl}" alt="User Image">
+                            <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
+                        </a>
+                    `;
+                    usersList.appendChild(listItem);
+                }
+            });
+        } else {
+            usersList.innerHTML = '<li>No users registered</li>';
         }
+    }).catch(error => alert('Failed to retrieve users: ' + error.message));
+}
+
+function setLibrarianSchool() {
+    const loggedInLibrarianId = sessionStorage.getItem('loggedInLibrarianId'); // Assumes librarian ID is stored in sessionStorage
+
+    if (!loggedInLibrarianId) {
+        alert('No logged-in librarian found.');
+        return;
+    }
+
+    const librarianRef = ref(database, `librarians/${loggedInLibrarianId}`);
+
+    get(librarianRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                const librarianData = snapshot.val();
+                const schoolName = librarianData.schoolName;
+
+                if (schoolName) {
+                    sessionStorage.setItem('librarianSchool', schoolName); // Store the school name in sessionStorage
+                    console.log('Librarian school set to:', schoolName);
+                } else {
+                    alert('No school information found for the logged-in librarian.');
+                }
+            } else {
+                alert('Librarian data not found.');
+            }
+        })
+        .catch(error => {
+            alert('Failed to retrieve librarian data: ' + error.message);
+        });
+}
+
+// Call this function during login or page load
+setLibrarianSchool();
+
         // Event listeners for filters and search
         document.getElementById('userCourseFilter').addEventListener('change', displayUsers);
         document.getElementById('userYearFilter').addEventListener('change', displayUsers);
