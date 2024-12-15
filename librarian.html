@@ -752,7 +752,7 @@
                         const userId = childSnapshot.key;
 
                         // Filter users by school
-                        if (user.schoolName !== loggedInSchool) {
+                        if (user.schoolName !== loggedInSchool) { // Ensure schoolName with capital "N" is used
                             return; // Skip users not from the same school
                         }
 
@@ -764,9 +764,12 @@
                             const listItem = document.createElement('li');
                             listItem.className = 'user-item';
                             listItem.dataset.id = userId;
+
+                            const profileImageUrl = user.profileImageUrl || 'default-placeholder.png'; // Add a placeholder image if no profileImageUrl
+
                             listItem.innerHTML = `
                                 <a href="userDetails.html?id=${userId}">
-                                    <img src="${user.profileImageUrl}" alt="User Image">
+                                    <img src="${profileImageUrl}" alt="User Image" onerror="this.src='default-placeholder.png';">
                                     <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
                                 </a>
                             `;
@@ -778,6 +781,7 @@
                 }
             }).catch(error => alert('Failed to retrieve users: ' + error.message));
         }
+
 
 function setLibrarianSchool() {
     const loggedInLibrarianId = sessionStorage.getItem('loggedInLibrarianId'); // Assumes librarian ID is stored in sessionStorage
@@ -851,7 +855,7 @@ setLibrarianSchool();
             }).then(snapshot => {
                 if (snapshot.exists()) {
                     const users = Object.values(snapshot.val());
-                    const filteredUsers = users.filter(user => user.schoolname === librarianSchoolName);
+                    const filteredUsers = users.filter(user => user.schoolName === librarianSchoolName); // Updated to schoolName
                     data[1] = filteredUsers.length; // Set user count
                 }
 
