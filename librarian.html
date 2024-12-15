@@ -522,6 +522,7 @@
         window.addEventListener('load', populateSchoolDropdowns);
         
         // Add User
+        // Add User
         document.getElementById('submitUser').addEventListener('click', () => {
             const submitButton = document.getElementById('submitUser');
             submitButton.disabled = true; // Disable the button
@@ -577,7 +578,7 @@
                                 set(newUserRef, {
                                     userId: userId,
                                     schoolId: userSchoolId,
-                                    schoolname: librarianSchoolName, // Automatically use librarian's schoolName
+                                    schoolName: librarianSchoolName, // Changed to schoolName with capital N
                                     lastName: userLastName,
                                     firstName: userFirstName,
                                     middleInitial: userMiddleInitial,
@@ -619,6 +620,7 @@
                 submitButton.disabled = false; // Re-enable the button
             }
         });
+
 
         document.getElementById('updateUser').addEventListener('click', () => {
             const userId = currentEditingUserId; // Ensure userId is set correctly
@@ -750,7 +752,7 @@
                         const userId = childSnapshot.key;
 
                         // Filter users by school
-                        if (user.schoolname !== loggedInSchool) {
+                        if (user.schoolName !== loggedInSchool) {
                             return; // Skip users not from the same school
                         }
 
