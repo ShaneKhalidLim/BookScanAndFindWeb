@@ -72,6 +72,8 @@
                 <h2>Edit Book</h2>
                 <label for="edit_book_id">Book ID</label>
                 <input type="text" id="edit_book_id" placeholder="Book ID" class="modern-input" readonly>
+                <label for="edit_book_schoolName">School Name</label>
+                <input type="text" id="edit_book_schoolName" placeholder="School Name" class="modern-input" readonly>
                 <label for="edit_book_img">Book Image</label>
                 <input type="file" id="edit_book_img" class="modern-input">
                 <label for="edit_book_title">Book Title</label>
@@ -100,15 +102,11 @@
                 <h2>Add User</h2>
                 <input type="file" id="user_img" class="modern-input">
                  <!-- School Dropdown -->
-                <select id="user_school_select" class="modern-input">
-                    <option value="" disabled selected>Select School</option>
-                </select>
                 <input type="text" id="user_schoolid" placeholder="School ID" class="modern-input">
                 <input type="text" id="user_lastname" placeholder="Last Name" class="modern-input">
                 <input type="text" id="user_firstname" placeholder="First Name" class="modern-input">
                 <input type="text" id="user_middleinitial" placeholder="Middle Initial (optional)" class="modern-input">
                 <input type="text" id="user_contactnumber" placeholder="Contact Number" class="modern-input">
-                
                 <!-- Course Dropdown -->
                 <select id="user_course" class="modern-input">
                     <option value="">Select Course</option>
@@ -151,10 +149,8 @@
                 <h2>Edit User</h2>
                 <input type="text" id="edit_user_id" placeholder="User ID" class="modern-input" readonly>
                 <input type="file" id="edit_user_img" class="modern-input">
-                <!-- School Dropdown -->
-                <select id="edit_user_school_select" class="modern-input">
-                    <option value="" disabled selected>Select School</option>
-                </select>
+                <!-- Display the school name as a read-only field -->
+                <input type="text" id="edit_user_schoolname" placeholder="School Name" class="modern-input" readonly>
                 <input type="text" id="edit_user_schoolid" placeholder="School ID" class="modern-input">
                 <input type="text" id="edit_user_lastname" placeholder="Last Name" class="modern-input">
                 <input type="text" id="edit_user_firstname" placeholder="First Name" class="modern-input">
@@ -300,7 +296,6 @@
         });
 
 
-       // Add Book
         document.getElementById('submitBook').addEventListener('click', () => {
             const submitButton = document.getElementById('submitBook');
             submitButton.disabled = true; // Disable the button
@@ -317,16 +312,12 @@
             const bookStatus = document.getElementById('book_status').value.trim();
             const bookImg = document.getElementById('book_img').files[0];
 
-            if (!bookTitle || !bookAuthor || !bookDescription || !bookCategory ||
-                !bookCallNumber || !bookBarcode || isNaN(bookShelfNumber) || 
-                isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg) {
-                alert('Please fill out all fields and select an image.');
-                submitButton.disabled = false; // Re-enable the button
-                return;
-            }
+            // Retrieve the librarian's school name
+            const librarianSchoolName = sessionStorage.getItem('librarianSchool');
 
-            if (!['Available', 'Unavailable', 'Disabled'].includes(bookStatus)) {
-                alert('Please select a valid status.');
+            if (!bookTitle || !bookAuthor || !bookDescription || !bookCategory || !bookCallNumber || !bookBarcode || 
+                isNaN(bookShelfNumber) || isNaN(bookShelfRow) || isNaN(bookShelfColumn) || !bookStatus || !bookImg || !librarianSchoolName) {
+                alert('Please fill out all fields and ensure the librarian has a school name.');
                 submitButton.disabled = false; // Re-enable the button
                 return;
             }
@@ -369,7 +360,8 @@
                                 shelfRow: bookShelfRow,
                                 shelfColumn: bookShelfColumn,
                                 bookStatus: bookStatus,
-                                imageURL: url
+                                imageURL: url,
+                                schoolName: librarianSchoolName // Include the school name
                             }))
                             .then(() => {
                                 alert('Book added successfully.');
@@ -387,9 +379,6 @@
                             })
                             .catch(error => alert('Failed to add book: ' + error.message))
                             .finally(() => submitButton.disabled = false); // Re-enable the button
-                    } else {
-                        alert('No existing books found in the database.');
-                        submitButton.disabled = false; // Re-enable the button
                     }
                 })
                 .catch(error => {
@@ -424,6 +413,73 @@
                 link.click();
             });
         });
+
+        document.getElementById('updateBook').addEventListener('click', () => {
+            const bookId = currentEditingBookId; // Ensure `currentEditingBookId` is set properly
+            if (!bookId) {
+                alert("Error: Book ID is missing. Please try again.");
+                return;
+            }
+
+            // Collect data from the form
+            const bookData = {
+                title: document.getElementById('edit_book_title').value.trim(),
+                author: document.getElementById('edit_book_author').value.trim(),
+                description: document.getElementById('edit_book_description').value.trim(),
+                category: document.getElementById('edit_book_category').value.trim(),
+                callnumber: document.getElementById('edit_book_callnumber').value.trim(),
+                barcode: document.getElementById('edit_book_barcode').value.trim(),
+                shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
+                shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
+                shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10),
+                schoolName: document.getElementById('edit_book_schoolName').value.trim(),
+            };
+
+            // Validate input fields
+            if (!bookData.title || !bookData.author || isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
+                alert("Please fill in all required fields and ensure shelf details are valid numbers.");
+                return;
+            }
+
+            // Check if an image is uploaded
+            const bookImg = document.getElementById('edit_book_img').files[0]; // Optional image
+
+            if (bookImg) {
+                // If an image is provided, upload it first
+                const storageReference = storageRef(storage, 'book_images/' + bookId);
+
+                uploadBytes(storageReference, bookImg)
+                    .then(snapshot => getDownloadURL(snapshot.ref))
+                    .then(url => {
+                        bookData.imageURL = url; // Update bookData with the new image URL
+
+                        // Update book data in the database
+                        return update(ref(database, 'books/' + bookId), bookData);
+                    })
+                    .then(() => {
+                        alert("Book updated successfully with the new image.");
+                        // Navigate back to the book details page
+                        window.location.href = `bookDetails.html?id=${bookId}`;
+                    })
+                    .catch(error => {
+                        console.error("Failed to update book with image:", error.message);
+                        alert("Failed to update book: " + error.message);
+                    });
+            } else {
+                // If no image is provided, only update the text fields
+                update(ref(database, 'books/' + bookId), bookData)
+                    .then(() => {
+                        alert("Book updated successfully.");
+                        // Navigate back to the book details page
+                        window.location.href = `bookDetails.html?id=${bookId}`;
+                    })
+                    .catch(error => {
+                        console.error("Failed to update book:", error.message);
+                        alert("Failed to update book: " + error.message);
+                    });
+            }
+        });
+
         function populateSchoolDropdowns() {
             const schoolSelectAdd = document.getElementById('user_school_select');
             const schoolSelectEdit = document.getElementById('edit_user_school_select');
@@ -431,8 +487,7 @@
             // Clear existing options
             schoolSelectAdd.innerHTML = '<option value="" disabled selected>Select School</option>';
             schoolSelectEdit.innerHTML = '<option value="" disabled selected>Select School</option>';
-
-            // Fetch schools from Firebase
+                // Fetch schools from Firebase
             get(child(ref(database), 'schools'))
                 .then(snapshot => {
                     if (snapshot.exists()) {
@@ -450,7 +505,7 @@
                             const editOption = document.createElement('option');
                             editOption.value = school.name;
                             editOption.textContent = school.name;
-                            schoolSelectEdit.appendChild(editOption);
+                                choolSelectEdit.appendChild(editOption);
                         });
                     } else {
                         console.log('No schools found in the database.');
@@ -461,7 +516,7 @@
                     console.error('Failed to fetch schools:', error);
                     alert('Unable to fetch schools. Please check the database or your connection.');
                 });
-    }
+        }
 
         // Call this function on page load
         window.addEventListener('load', populateSchoolDropdowns);
@@ -472,7 +527,7 @@
             submitButton.disabled = true; // Disable the button
 
             const userSchoolId = document.getElementById('user_schoolid').value.trim();
-            const userSchoolName = document.getElementById('user_school_select').value.trim(); // Added schoolname
+            const librarianSchoolName = sessionStorage.getItem('librarianSchool'); // Automatically set schoolName
             const userLastName = document.getElementById('user_lastname').value.trim();
             const userFirstName = document.getElementById('user_firstname').value.trim();
             const userMiddleInitial = document.getElementById('user_middleinitial').value.trim();
@@ -483,7 +538,7 @@
 
             if (
                 userSchoolId &&
-                userSchoolName && // Validate schoolname
+                librarianSchoolName && // Use librarian's schoolName
                 userLastName &&
                 userFirstName &&
                 userContactNumber &&
@@ -522,7 +577,7 @@
                                 set(newUserRef, {
                                     userId: userId,
                                     schoolId: userSchoolId,
-                                    schoolname: userSchoolName, // Save as schoolname
+                                    schoolname: librarianSchoolName, // Automatically use librarian's schoolName
                                     lastName: userLastName,
                                     firstName: userFirstName,
                                     middleInitial: userMiddleInitial,
@@ -535,14 +590,13 @@
                             )
                             .then(() => {
                                 // Open SMS app to send OTP
-                                const message = `This is your one-time password: ${otp}`;
+                                const message = `Your OTP for BookScan&Find is ${otp}. Do not share this code with anyone. }`;
                                 window.location.href = `sms:${userContactNumber}?body=${encodeURIComponent(
                                     message
                                 )}`;
 
-                                alert('User added successfully and OTP has been sent!');
+                                alert('User added successfully, and OTP has been sent!');
                                 document.getElementById('user_schoolid').value = '';
-                                document.getElementById('user_school_select').value = ''; // Clear schoolname
                                 document.getElementById('user_lastname').value = '';
                                 document.getElementById('user_firstname').value = '';
                                 document.getElementById('user_middleinitial').value = '';
@@ -566,79 +620,10 @@
             }
         });
 
-        document.getElementById('updateBook').addEventListener('click', () => {
-            const bookId = currentEditingBookId;
-            if (!bookId) {
-                console.error("Error: currentEditingBookId is not set.");
-                alert("Error: Book ID is missing. Please try again.");
-                return;
-            }
-
-            // Collect book data
-            const bookData = {
-                title: document.getElementById('edit_book_title').value.trim(),
-                author: document.getElementById('edit_book_author').value.trim(),
-                description: document.getElementById('edit_book_description').value.trim(),
-                category: document.getElementById('edit_book_category').value.trim(),
-                callnumber: document.getElementById('edit_book_callnumber').value.trim(),
-                barcode: document.getElementById('edit_book_barcode').value.trim(),
-                shelfNumber: parseInt(document.getElementById('edit_book_shelfNumber').value, 10),
-                shelfRow: parseInt(document.getElementById('edit_book_shelfRow').value, 10),
-                shelfColumn: parseInt(document.getElementById('edit_book_shelfColumn').value, 10)
-            };
-
-            // Check if shelf values are valid numbers
-            if (isNaN(bookData.shelfNumber) || isNaN(bookData.shelfRow) || isNaN(bookData.shelfColumn)) {
-                alert("Please enter valid numbers for the shelf fields.");
-                return;
-            }
-
-            // Get the optional image file
-            const bookImg = document.getElementById('edit_book_img').files[0]; // Optional image
-
-            // If there's an image, upload it first
-            if (bookImg) {
-                const storageReference = storageRef(storage, 'book_images/' + bookId);
-
-                // Upload the image and get the download URL
-                uploadBytes(storageReference, bookImg)
-                    .then(snapshot => getDownloadURL(snapshot.ref))
-                    .then(url => {
-                        // Update the bookData object with the image URL
-                        bookData.imageURL = url;
-
-                        // Update all fields in Firebase
-                        return update(ref(database, 'books/' + bookId), bookData);
-                    })
-                    .then(() => {
-                        alert('Book updated successfully with image.');
-                        console.log("Firebase update successful:", bookData);
-                        window.location.href = `bookDetails.html?id=${bookId}`;
-                    })
-                    .catch(error => {
-                        console.error("Failed to update book with image:", error.message);
-                        alert('Failed to update book: ' + error.message);
-                    });
-            } else {
-                // If no image is provided, just update the book fields
-                update(ref(database, 'books/' + bookId), bookData)
-                    .then(() => {
-                        alert('Book updated successfully.');
-                        console.log("Firebase update successful:", bookData);
-                        window.location.href = `bookDetails.html?id=${bookId}`;
-                    })
-                    .catch(error => {
-                        console.error("Failed to update book:", error.message);
-                        alert('Failed to update book: ' + error.message);
-                    });
-            }
-        });
-
-
         document.getElementById('updateUser').addEventListener('click', () => {
             const userId = currentEditingUserId; // Ensure userId is set correctly
             const userSchoolId = document.getElementById('edit_user_schoolid').value.trim();
-            const schoolName = document.getElementById('edit_user_school_select').value; // Get selected school name
+            const librarianSchoolName = sessionStorage.getItem('librarianSchool'); // Automatically set schoolName
             const userLastName = document.getElementById('edit_user_lastname').value.trim();
             const userFirstName = document.getElementById('edit_user_firstname').value.trim();
             const userPassword = document.getElementById('edit_user_password').value;
@@ -648,35 +633,29 @@
             const userMiddleInitial = document.getElementById('edit_user_middleinitial').value.trim();
             const userImg = document.getElementById('edit_user_img').files[0]; // Optional image
 
-            // Prepare userData object with only non-empty fields
             const userData = {
-                schoolId: userSchoolId || null,
-                schoolname: schoolName || null, // Ensure the selected school value is saved
+                schoolId: userSchoolId,
+                schoolname: librarianSchoolName, // Automatically use librarian's schoolName
                 lastName: userLastName || null,
                 firstName: userFirstName || null,
                 password: userPassword || null,
                 contactNumber: userContactNumber || null,
                 course: userCourse || null,
-                year: userYear || null
+                year: userYear || null,
             };
 
-            // Include middleInitial only if provided
             if (userMiddleInitial) {
                 userData.middleInitial = userMiddleInitial;
             }
 
-            // If there's an image, upload and update profileImageUrl
             if (userImg) {
                 const storageReference = storageRef(storage, 'profile_images/' + userId);
 
-                // Upload the image to storage and get the download URL
                 uploadBytes(storageReference, userImg)
                     .then(snapshot => getDownloadURL(snapshot.ref))
                     .then(url => {
-                        // Update only the profileImageUrl field
                         userData.profileImageUrl = url;
 
-                        // Update all fields in Firebase
                         return update(ref(database, 'users/' + userId), userData);
                     })
                     .then(() => {
@@ -685,7 +664,6 @@
                     })
                     .catch(error => alert('Failed to update user: ' + error.message));
             } else {
-                // If no image, update Firebase directly without changing profileImageUrl
                 update(ref(database, 'users/' + userId), userData)
                     .then(() => {
                         alert('User updated successfully');
@@ -695,8 +673,6 @@
             }
         });
 
-
-        // Display Books (without settings menu)
         function displayBooks() {
             const searchQuery = document.getElementById('searchBookInput').value.toLowerCase();
             const categoryFilter = document.getElementById('bookCategoryFilter').value;
@@ -704,86 +680,102 @@
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
 
-            get(child(ref(database), 'books')).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => {
-                        const book = childSnapshot.val();
-                        const bookId = childSnapshot.key;
+            // Get the schoolName of the logged-in librarian
+            const librarianSchoolName = sessionStorage.getItem('librarianSchool');
 
-                        const matchesSearch = book.title.toLowerCase().includes(searchQuery) || 
-                                              book.author.toLowerCase().includes(searchQuery);
-                        const matchesCategory = !categoryFilter || book.category === categoryFilter;
-                        const matchesStatus = !statusFilter || book.bookStatus === statusFilter;
+            if (!librarianSchoolName) {
+                alert('Error: No school information found for the logged-in librarian.');
+                return;
+            }
 
-                        if (matchesSearch && matchesCategory && matchesStatus) {
-                            const listItem = document.createElement('li');
-                            listItem.className = 'book-item';
-                            listItem.dataset.id = bookId;
-                            listItem.innerHTML = `
-                                <img src="${book.imageURL}" alt="Book Image">
-                                <div class="details">${book.title} <br> ${book.author}</div>
-                            `;
-                            booksList.appendChild(listItem);
+            get(child(ref(database), 'books'))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const book = childSnapshot.val();
+                            const bookId = childSnapshot.key;
 
-                            listItem.querySelector('img').addEventListener('click', () => {
-                                window.location.href = `bookDetails.html?id=${bookId}`;
-                            });
-                        }
-                    });
-                } else {
-                    booksList.innerHTML = '<li>No books registered</li>';
-                }
-            }).catch(error => alert('Failed to retrieve books: ' + error.message));
+                            // Check if the book belongs to the same school as the librarian
+                            if (book.schoolName !== librarianSchoolName) {
+                                return; // Skip books that don't match the schoolName
+                            }
+
+                            const matchesSearch = book.title.toLowerCase().includes(searchQuery) || 
+                                                book.author.toLowerCase().includes(searchQuery);
+                            const matchesCategory = !categoryFilter || book.category === categoryFilter;
+                            const matchesStatus = !statusFilter || book.bookStatus === statusFilter;
+
+                            if (matchesSearch && matchesCategory && matchesStatus) {
+                                const listItem = document.createElement('li');
+                                listItem.className = 'book-item';
+                                listItem.dataset.id = bookId;
+                                listItem.innerHTML = `
+                                    <img src="${book.imageURL}" alt="Book Image">
+                                    <div class="details">${book.title} <br> ${book.author}</div>
+                                `;
+                                booksList.appendChild(listItem);
+
+                                listItem.querySelector('img').addEventListener('click', () => {
+                                    window.location.href = `bookDetails.html?id=${bookId}`;
+                                });
+                            }
+                        });
+                    } else {
+                        booksList.innerHTML = '<li>No books registered</li>';
+                    }
+                })
+                .catch(error => alert('Failed to retrieve books: ' + error.message));
         }
+
 
         // Display Users (without settings menu)
         function displayUsers() {
-    const loggedInSchool = sessionStorage.getItem('librarianSchool'); // Retrieve the logged-in librarian's school
+            const loggedInSchool = sessionStorage.getItem('librarianSchool'); // Retrieve the logged-in librarian's school
 
-    if (!loggedInSchool) {
-        alert('No school information found for the logged-in librarian.');
-        return;
-    }
+            if (!loggedInSchool) {
+                alert('No school information found for the logged-in librarian.');
+                return;
+            }
 
-    const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
-    const courseFilter = document.getElementById('userCourseFilter').value;
-    const yearFilter = document.getElementById('userYearFilter').value;
-    const usersList = document.getElementById('usersList');
-    usersList.innerHTML = '';
+            const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
+            const courseFilter = document.getElementById('userCourseFilter').value;
+            const yearFilter = document.getElementById('userYearFilter').value;
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '';
 
-    get(child(ref(database), 'users')).then(snapshot => {
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const user = childSnapshot.val();
-                const userId = childSnapshot.key;
+            get(child(ref(database), 'users')).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const user = childSnapshot.val();
+                        const userId = childSnapshot.key;
 
-                // Filter users by school
-                if (user.schoolname !== loggedInSchool) {
-                    return; // Skip users not from the same school
+                        // Filter users by school
+                        if (user.schoolname !== loggedInSchool) {
+                            return; // Skip users not from the same school
+                        }
+
+                        const matchesSearch = `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery);
+                        const matchesCourse = !courseFilter || user.course === courseFilter;
+                        const matchesYear = !yearFilter || user.year === yearFilter;
+
+                        if (matchesSearch && matchesCourse && matchesYear) {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'user-item';
+                            listItem.dataset.id = userId;
+                            listItem.innerHTML = `
+                                <a href="userDetails.html?id=${userId}">
+                                    <img src="${user.profileImageUrl}" alt="User Image">
+                                    <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
+                                </a>
+                            `;
+                            usersList.appendChild(listItem);
+                        }
+                    });
+                } else {
+                    usersList.innerHTML = '<li>No users registered</li>';
                 }
-
-                const matchesSearch = `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery);
-                const matchesCourse = !courseFilter || user.course === courseFilter;
-                const matchesYear = !yearFilter || user.year === yearFilter;
-
-                if (matchesSearch && matchesCourse && matchesYear) {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'user-item';
-                    listItem.dataset.id = userId;
-                    listItem.innerHTML = `
-                        <a href="userDetails.html?id=${userId}">
-                            <img src="${user.profileImageUrl}" alt="User Image">
-                            <div class="details">${user.firstName} ${user.lastName}<br>${user.course}, Year ${user.year}</div>
-                        </a>
-                    `;
-                    usersList.appendChild(listItem);
-                }
-            });
-        } else {
-            usersList.innerHTML = '<li>No users registered</li>';
+            }).catch(error => alert('Failed to retrieve users: ' + error.message));
         }
-    }).catch(error => alert('Failed to retrieve users: ' + error.message));
-}
 
 function setLibrarianSchool() {
     const loggedInLibrarianId = sessionStorage.getItem('loggedInLibrarianId'); // Assumes librarian ID is stored in sessionStorage
@@ -832,25 +824,36 @@ setLibrarianSchool();
 
         let dashboardChart; // Global variable to hold the chart instance
 
-        // Update Dashboard Chart
         function updateDashboardChart() {
             const labels = ['Books', 'Users'];
-            const data = [0, 0]; // Array to store book and user counts
+            const data = [0, 0]; // Array to store filtered counts for books and users
 
-            // Retrieve number of books
+            // Retrieve the schoolName of the logged-in librarian
+            const librarianSchoolName = sessionStorage.getItem('librarianSchool');
+
+            if (!librarianSchoolName) {
+                alert('Error: No school information found for the logged-in librarian.');
+                return;
+            }
+
+            // Retrieve and count books that match the librarian's schoolName
             get(child(ref(database), 'books')).then(snapshot => {
                 if (snapshot.exists()) {
-                    data[0] = snapshot.size; // Number of books
+                    const books = Object.values(snapshot.val());
+                    const filteredBooks = books.filter(book => book.schoolName === librarianSchoolName);
+                    data[0] = filteredBooks.length; // Set book count
                 }
 
-                // Retrieve number of users
+                // Retrieve and count users that match the librarian's schoolName
                 return get(child(ref(database), 'users'));
             }).then(snapshot => {
                 if (snapshot.exists()) {
-                    data[1] = snapshot.size; // Number of users
+                    const users = Object.values(snapshot.val());
+                    const filteredUsers = users.filter(user => user.schoolname === librarianSchoolName);
+                    data[1] = filteredUsers.length; // Set user count
                 }
 
-                // If a chart instance already exists, destroy it
+                // If a chart instance already exists, destroy it to avoid duplication
                 if (dashboardChart) {
                     dashboardChart.destroy();
                 }
@@ -873,7 +876,7 @@ setLibrarianSchool();
                         scales: {
                             x: {
                                 ticks: {
-                                    color: '#000', // Set x-axis tick labels to black
+                                    color: '#000',
                                     font: {
                                         size: 14,
                                         family: 'Arial',
@@ -883,7 +886,7 @@ setLibrarianSchool();
                             },
                             y: {
                                 ticks: {
-                                    color: '#000', // Set y-axis tick labels to black
+                                    color: '#000',
                                     font: {
                                         size: 14,
                                         family: 'Arial',
@@ -896,7 +899,7 @@ setLibrarianSchool();
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: '#000', // Set legend text color to black
+                                    color: '#000',
                                     font: {
                                         size: 14,
                                         family: 'Arial',
@@ -905,23 +908,20 @@ setLibrarianSchool();
                                 }
                             },
                             tooltip: {
-                                bodyColor: '#fff', // Tooltip body text color
-                                titleColor: '#fff', // Tooltip title text color
-                                footerColor: '#fff' // Tooltip footer text color
+                                bodyColor: '#fff',
+                                titleColor: '#fff',
+                                footerColor: '#fff'
                             }
                         }
                     }
                 });
             }).catch(error => alert('Failed to update chart: ' + error.message));
         }
-        
+
         function loadEditingBookData() {
-            const bookData = JSON.parse(sessionStorage.getItem("editingBookData"));
+            const bookData = JSON.parse(sessionStorage.getItem('editingBookData'));
             if (bookData) {
                 currentEditingBookId = bookData.id; // Set the global editing book ID
-                console.log("Loading book for editing with ID:", bookData.id);
-
-                // Populate the form with existing book data
                 document.getElementById('edit_book_id').value = bookData.id;
                 document.getElementById('edit_book_title').value = bookData.title;
                 document.getElementById('edit_book_author').value = bookData.author;
@@ -932,9 +932,7 @@ setLibrarianSchool();
                 document.getElementById('edit_book_shelfNumber').value = bookData.shelfNumber;
                 document.getElementById('edit_book_shelfRow').value = bookData.shelfRow;
                 document.getElementById('edit_book_shelfColumn').value = bookData.shelfColumn;
-            } else {
-                alert("No book data found for editing.");
-                console.error("Error: No book data found in sessionStorage.");
+                document.getElementById('edit_book_schoolName').value = bookData.schoolName || sessionStorage.getItem('librarianSchool');
             }
         }
 
@@ -969,6 +967,7 @@ setLibrarianSchool();
                 // Populate the form with existing user data
                 document.getElementById('edit_user_id').value = userData.userId;
                 document.getElementById('edit_user_schoolid').value = userData.schoolId;
+                document.getElementById('edit_user_schoolname').value = userData.schoolname || ""; // Handle schoolname
                 document.getElementById('edit_user_lastname').value = userData.lastName;
                 document.getElementById('edit_user_firstname').value = userData.firstName;
                 document.getElementById('edit_user_middleinitial').value = userData.middleInitial || "";
@@ -981,6 +980,7 @@ setLibrarianSchool();
                 console.error("Error: No user data found in sessionStorage.");
             }
         }
+
 
         // Navigation
         function navigateToSection(sectionId) {
