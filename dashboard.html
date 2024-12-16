@@ -756,12 +756,6 @@
         }
 
 
-        window.addEventListener('load', () => {
-            populateUserFilters(); // Populates course and year filters
-            displayUsers(); // Display users with default filters
-        });
-
-
         function displayUsers() {
             const searchQuery = document.getElementById('searchUserInput').value.toLowerCase();
             const selectedCourse = document.getElementById('userCourseFilter').value;
@@ -784,7 +778,7 @@
                             const matchesSearch = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase().includes(searchQuery);
                             const matchesCourse = !selectedCourse || user.course === selectedCourse;
                             const matchesYear = !selectedYear || user.year === selectedYear;
-                            const matchesSchool = !selectedSchool || user.schoolname === selectedSchool; // Ensure this matches `schooll`
+                            const matchesSchool = !selectedSchool || user.schoolName === selectedSchool; // Ensure this matches `schooll`
 
                             if (matchesSearch && matchesCourse && matchesYear && matchesSchool) {
                                 found = true;
@@ -799,7 +793,7 @@
                                         <strong>${user.firstName || ''} ${user.lastName || ''}</strong><br>
                                         Course: ${user.course || 'N/A'}<br>
                                         Year: ${user.year || 'N/A'}<br>
-                                        School: ${user.schoolname || 'N/A'} <!-- Display the correct school -->
+                                        School: ${user.schoolName || 'N/A'} <!-- Display the correct school -->
                                     </div>
                                 `;
                                 usersList.appendChild(listItem);
